@@ -1,9 +1,10 @@
 /**
  * Character router - handles all character-related operations
  */
-import { z } from "zod";
-import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
+
 import { TRPCError } from "@trpc/server";
+import { z } from "zod";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 
 // Character input schemas
 const createCharacterSchema = z.object({
@@ -119,7 +120,15 @@ export const characterRouter = createTRPCRouter({
 	search: publicProcedure
 		.input(characterSearchSchema)
 		.query(async ({ ctx, input }) => {
-			const where: any = {};
+			const where: {
+				name?: {
+					contains: string;
+					mode: "insensitive";
+				};
+				dynamicTags?: {
+					hasEvery: string[];
+				};
+			} = {};
 
 			if (input.name) {
 				where.name = {
@@ -136,7 +145,11 @@ export const characterRouter = createTRPCRouter({
 
 			// Handle static tags filtering
 			if (input.staticTags) {
-				const staticTagsFilter: any = {};
+				const staticTagsFilter: {
+					path?: string[];
+					gte?: number;
+					lte?: number;
+				} = {};
 				if (
 					input.staticTags.heightMin !== undefined ||
 					input.staticTags.heightMax !== undefined
@@ -189,7 +202,7 @@ export const characterRouter = createTRPCRouter({
 					avatarUrl: input.avatarUrl,
 					portraitUrl: input.portraitUrl,
 					info: input.info,
-					staticTags: input.staticTags as any,
+					staticTags: input.staticTags,
 					dynamicTags: input.dynamicTags,
 				},
 			});
@@ -211,7 +224,7 @@ export const characterRouter = createTRPCRouter({
 					}),
 					...(data.info !== undefined && { info: data.info }),
 					...(data.staticTags !== undefined && {
-						staticTags: data.staticTags as any,
+						staticTags: data.staticTags,
 					}),
 					...(data.dynamicTags !== undefined && {
 						dynamicTags: data.dynamicTags,

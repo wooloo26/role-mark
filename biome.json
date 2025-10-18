@@ -7,7 +7,7 @@
 	},
 	"files": {
 		"ignoreUnknown": true,
-		"includes": ["app/**/*.{ts,tsx}", "lib/**/*.ts", "components/**/*.{ts,tsx}"]
+		"includes": ["**", "!**/node_modules", "!.next", "!.vscode"]
 	},
 	"formatter": {
 		"enabled": true,
@@ -21,7 +21,8 @@
 				"noNonNullAssertion": "off"
 			},
 			"suspicious": {
-				"noArrayIndexKey": "off"
+				"noArrayIndexKey": "off",
+				"noUnknownAtRules": "off"
 			},
 			"security": {
 				"noDangerouslySetInnerHtml": "off"

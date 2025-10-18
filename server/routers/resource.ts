@@ -1,9 +1,10 @@
 /**
  * Resource router - handles all resource-related operations
  */
-import { z } from "zod";
-import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
+
 import { TRPCError } from "@trpc/server";
+import { z } from "zod";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 
 const createResourceSchema = z.object({
 	title: z.string().min(1).max(255),
@@ -72,7 +73,12 @@ export const resourceRouter = createTRPCRouter({
 	search: publicProcedure
 		.input(resourceSearchSchema)
 		.query(async ({ ctx, input }) => {
-			const where: any = {};
+			const where: {
+				title?: { contains: string; mode: "insensitive" };
+				dynamicTags?: { hasEvery: string[] };
+				mimeType?: { contains: string };
+				characters?: { some: { characterId: string } };
+			} = {};
 
 			if (input.title) {
 				where.title = {

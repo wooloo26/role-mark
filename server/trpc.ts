@@ -2,9 +2,9 @@
  * tRPC initialization and context setup
  */
 import { initTRPC, TRPCError } from "@trpc/server";
+import type { Session } from "next-auth";
 import superjson from "superjson";
 import { ZodError } from "zod";
-import type { Session } from "next-auth";
 import { prisma } from "@/lib/prisma";
 
 /**
@@ -70,21 +70,4 @@ export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
 			session: { ...ctx.session, user: ctx.session.user },
 		},
 	});
-});
-
-/**
- * Middleware to check if user has NSFW content enabled
- */
-export const nsfwProcedure = protectedProcedure.use(({ ctx, next }) => {
-	const settings = ctx.session.user as any;
-	const userSettings = settings?.settings as { showNSFW?: boolean } | undefined;
-
-	if (!userSettings?.showNSFW) {
-		throw new TRPCError({
-			code: "FORBIDDEN",
-			message: "NSFW content is disabled in your settings",
-		});
-	}
-
-	return next({ ctx });
 });

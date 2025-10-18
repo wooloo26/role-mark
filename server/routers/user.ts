@@ -1,10 +1,11 @@
 /**
  * User router - handles user settings and profile operations
  */
-import { z } from "zod";
-import { hash } from "bcryptjs";
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
+
 import { TRPCError } from "@trpc/server";
+import { hash } from "bcryptjs";
+import { z } from "zod";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 
 const registerSchema = z.object({
 	name: z.string().min(1).max(255),
@@ -102,7 +103,7 @@ export const userRouter = createTRPCRouter({
 				select: { settings: true },
 			});
 
-			const currentSettings = (currentUser?.settings as any) || {};
+			const currentSettings = (currentUser?.settings as typeof input) || {};
 			const mergedSettings = {
 				...currentSettings,
 				...(input.showNSFW !== undefined && { showNSFW: input.showNSFW }),
@@ -113,7 +114,6 @@ export const userRouter = createTRPCRouter({
 					},
 				}),
 			};
-
 			return await ctx.prisma.user.update({
 				where: { id: ctx.session.user.id },
 				data: {

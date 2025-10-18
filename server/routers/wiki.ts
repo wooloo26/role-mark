@@ -1,9 +1,10 @@
 /**
  * Wiki router - handles all wiki page operations
  */
-import { z } from "zod";
-import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
+
 import { TRPCError } from "@trpc/server";
+import { z } from "zod";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 
 const createWikiPageSchema = z.object({
 	title: z.string().min(1).max(500),
@@ -77,7 +78,11 @@ export const wikiRouter = createTRPCRouter({
 	search: publicProcedure
 		.input(wikiSearchSchema)
 		.query(async ({ ctx, input }) => {
-			const where: any = {};
+			const where: {
+				title?: { contains: string; mode: "insensitive" };
+				content?: { contains: string; mode: "insensitive" };
+				characters?: { some: { characterId: string } };
+			} = {};
 
 			if (input.title) {
 				where.title = {
@@ -201,8 +206,7 @@ export const wikiRouter = createTRPCRouter({
 			// Create new version if content or title changed
 			const shouldCreateVersion =
 				data.content !== undefined || data.title !== undefined;
-			const nextVersion =
-				(currentPage.versions[0]?.version || 0) + 1;
+			const nextVersion = (currentPage.versions[0]?.version || 0) + 1;
 
 			return await ctx.prisma.wikiPage.update({
 				where: { id },

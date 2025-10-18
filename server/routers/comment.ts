@@ -1,9 +1,10 @@
 /**
  * Comment router - handles all comment operations
  */
+
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
-import { TRPCError } from "@trpc/server";
 
 const createCommentSchema = z.object({
 	content: z.string().min(1).max(5000),
