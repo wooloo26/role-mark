@@ -88,8 +88,44 @@ export function ThemeScript() {
 				// Color palettes (built-in only, custom palettes will flash once)
 				const colorPalettes = {
 					default: {
-						light: { background: 'oklch(1 0 0)', foreground: 'oklch(0.145 0 0)', card: 'oklch(1 0 0)', cardForeground: 'oklch(0.145 0 0)', popover: 'oklch(1 0 0)', popoverForeground: 'oklch(0.145 0 0)', primary: 'oklch(0.205 0 0)', primaryForeground: 'oklch(0.985 0 0)', secondary: 'oklch(0.97 0 0)', secondaryForeground: 'oklch(0.205 0 0)', muted: 'oklch(0.97 0 0)', mutedForeground: 'oklch(0.556 0 0)', accent: 'oklch(0.97 0 0)', accentForeground: 'oklch(0.205 0 0)', border: 'oklch(0.922 0 0)', input: 'oklch(0.922 0 0)', ring: 'oklch(0.708 0 0)' },
-						dark: { background: 'oklch(0.145 0 0)', foreground: 'oklch(0.985 0 0)', card: 'oklch(0.205 0 0)', cardForeground: 'oklch(0.985 0 0)', popover: 'oklch(0.205 0 0)', popoverForeground: 'oklch(0.985 0 0)', primary: 'oklch(0.922 0 0)', primaryForeground: 'oklch(0.205 0 0)', secondary: 'oklch(0.269 0 0)', secondaryForeground: 'oklch(0.985 0 0)', muted: 'oklch(0.269 0 0)', mutedForeground: 'oklch(0.708 0 0)', accent: 'oklch(0.269 0 0)', accentForeground: 'oklch(0.985 0 0)', border: 'oklch(1 0 0 / 10%)', input: 'oklch(1 0 0 / 15%)', ring: 'oklch(0.556 0 0)' }
+						light: {
+							background: "oklch(0.99 0 0)",
+							foreground: "oklch(0.2 0 0)",
+							card: "oklch(1 0 0)",
+							cardForeground: "oklch(0.2 0 0)",
+							popover: "oklch(1 0 0)",
+							popoverForeground: "oklch(0.2 0 0)",
+							primary: "oklch(0.68 0.154 221.72)",
+							primaryForeground: "oklch(1 0 0)",
+							secondary: "oklch(0.96 0.008 221.72)",
+							secondaryForeground: "oklch(0.3 0 0)",
+							muted: "oklch(0.96 0.004 240)",
+							mutedForeground: "oklch(0.5 0.01 240)",
+							accent: "oklch(0.68 0.154 221.72)",
+							accentForeground: "oklch(1 0 0)",
+							border: "oklch(0.9 0.008 240)",
+							input: "oklch(0.9 0.008 240)",
+							ring: "oklch(0.68 0.154 221.72)",
+						},
+						dark: {
+							background: "oklch(0.15 0.01 240)",
+							foreground: "oklch(0.95 0.008 240)",
+							card: "oklch(0.18 0.012 240)",
+							cardForeground: "oklch(0.95 0.008 240)",
+							popover: "oklch(0.18 0.012 240)",
+							popoverForeground: "oklch(0.95 0.008 240)",
+							primary: "oklch(0.68 0.154 221.72)",
+							primaryForeground: "oklch(0.98 0 0)",
+							secondary: "oklch(0.25 0.02 240)",
+							secondaryForeground: "oklch(0.95 0.008 240)",
+							muted: "oklch(0.25 0.015 240)",
+							mutedForeground: "oklch(0.6 0.015 240)",
+							accent: "oklch(0.68 0.154 221.72)",
+							accentForeground: "oklch(0.98 0 0)",
+							border: "oklch(0.3 0.02 240)",
+							input: "oklch(0.3 0.02 240)",
+							ring: "oklch(0.68 0.154 221.72)",
+						},
 					},
 				};
 				

@@ -41,11 +41,6 @@ export function ThemeCustomizer() {
 
 		// Built-in palettes with nice labels
 		paletteLabels.default = "Default (Neutral)";
-		paletteLabels.ocean = "Ocean (Blue)";
-		paletteLabels.forest = "Forest (Green)";
-		paletteLabels.sunset = "Sunset (Orange)";
-		paletteLabels.purple = "Purple (Violet)";
-		paletteLabels.rose = "Rose (Pink)";
 
 		// Add custom palettes
 		Object.keys(allPalettes).forEach((name) => {
