@@ -3,7 +3,10 @@
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { ThemeCustomizer } from "@/components/theme/theme-customizer";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -15,12 +18,18 @@ import {
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useThemeSettings } from "@/lib/hooks/use-theme-settings";
+import { trpc } from "@/lib/trpc/client";
 
 export default function SettingsPage() {
 	const { data: session, status } = useSession();
 	const router = useRouter();
+	const { theme } = useTheme();
+	const { componentTheme } = useThemeSettings();
 	const [showNSFW, setShowNSFW] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
+
+	const updateSettingsMutation = trpc.user.updateSettings.useMutation();
 
 	useEffect(() => {
 		if (status === "unauthenticated") {
@@ -48,8 +57,16 @@ export default function SettingsPage() {
 				}),
 			);
 
-			// In a real app, you'd also save to the database via tRPC
-			// await updateSettings.mutateAsync({ showNSFW });
+			// Save to database via tRPC
+			if (session) {
+				await updateSettingsMutation.mutateAsync({
+					showNSFW,
+					theme: {
+						colorTheme: (theme as "light" | "dark" | "system") || "system",
+						componentTheme,
+					},
+				});
+			}
 
 			setTimeout(() => {
 				setIsSaving(false);
@@ -109,16 +126,28 @@ export default function SettingsPage() {
 					<TabsContent value="appearance" className="space-y-4">
 						<Card>
 							<CardHeader>
-								<CardTitle>Theme</CardTitle>
+								<CardTitle>Color Theme</CardTitle>
 								<CardDescription>
-									Customize the appearance of the application
+									Switch between light, dark, and system themes
+								</CardDescription>
+							</CardHeader>
+							<CardContent className="flex items-center justify-between">
+								<p className="text-sm text-muted-foreground">
+									Toggle between color themes
+								</p>
+								<ThemeToggle />
+							</CardContent>
+						</Card>
+
+						<Card>
+							<CardHeader>
+								<CardTitle>Component Customization</CardTitle>
+								<CardDescription>
+									Customize component styling independently from color themes
 								</CardDescription>
 							</CardHeader>
 							<CardContent>
-								<p className="text-sm text-muted-foreground">
-									Use the theme toggle in the header to switch between light and
-									dark modes.
-								</p>
+								<ThemeCustomizer />
 							</CardContent>
 						</Card>
 					</TabsContent>

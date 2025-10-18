@@ -116,7 +116,43 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Component Theme System */
+@layer utilities {
+
+  /* Card style variations */
+  [data-card-style="flat"] .card {
+    @apply shadow-none;
+  }
+
+  [data-card-style="bordered"] .card {
+    @apply border-2;
+  }
+
+  [data-card-style="elevated"] .card {
+    @apply shadow-md;
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: var(--animation-duration, 0.01ms) !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: var(--animation-duration, 0.01ms) !important;
+    }
+  }
+
+  /* Custom animation duration override */
+  * {
+    animation-duration: var(--animation-duration);
+    transition-duration: var(--animation-duration);
   }
 }

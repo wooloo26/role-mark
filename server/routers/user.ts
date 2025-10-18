@@ -16,10 +16,15 @@ const updateSettingsSchema = z.object({
 	showNSFW: z.boolean().optional(),
 	theme: z
 		.object({
-			colorScheme: z.enum(["light", "dark", "custom"]).optional(),
-			customColors: z.record(z.string(), z.string()).optional(),
-			borderRadius: z.number().min(0).max(20).optional(),
-			fontSize: z.number().min(12).max(24).optional(),
+			colorTheme: z.enum(["light", "dark", "system"]).optional(),
+			componentTheme: z
+				.object({
+					radius: z.enum(["none", "sm", "md", "lg", "xl"]).optional(),
+					fontSize: z.enum(["xs", "sm", "base", "lg", "xl"]).optional(),
+					cardStyle: z.enum(["flat", "bordered", "elevated"]).optional(),
+					reducedMotion: z.boolean().optional(),
+				})
+				.optional(),
 		})
 		.optional(),
 });

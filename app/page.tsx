@@ -1,5 +1,9 @@
-import { BookOpen, FolderOpen, Tag, Users } from "lucide-react";
+"use client";
+
+import { BookOpen, FolderOpen, Settings2, Tag, Users } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
+import { ThemeCustomizer } from "@/components/theme/theme-customizer";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -8,8 +12,17 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
 
 export default function Home() {
+	const [isCustomizerOpen, setIsCustomizerOpen] = useState(false);
 	return (
 		<div className="flex flex-col min-h-screen">
 			{/* Hero Section */}
@@ -28,6 +41,26 @@ export default function Home() {
 					<Button asChild variant="outline" size="lg">
 						<Link href="/wiki">Browse Wiki</Link>
 					</Button>
+				</div>
+				<div className="mt-6">
+					<Dialog open={isCustomizerOpen} onOpenChange={setIsCustomizerOpen}>
+						<DialogTrigger asChild>
+							<Button variant="ghost" size="sm">
+								<Settings2 className="mr-2 h-4 w-4" />
+								Customize Appearance
+							</Button>
+						</DialogTrigger>
+						<DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+							<DialogHeader>
+								<DialogTitle>Appearance Settings</DialogTitle>
+								<DialogDescription>
+									Customize component styling to match your preferences. Theme
+									toggle is available in the header.
+								</DialogDescription>
+							</DialogHeader>
+							<ThemeCustomizer />
+						</DialogContent>
+					</Dialog>
 				</div>
 			</section>
 
