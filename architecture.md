@@ -11,7 +11,6 @@
 | **Server-Side Rendering** | Next.js (App Router) | SSR for public pages, supporting dynamic routes and data prefetching                                        |
 | **ORM**                   | Prisma               | Type-safe database client for PostgreSQL, supporting schema definition and migrations                       |
 | **Frontend UI**           | shadcn/ui + magicui  | Customizable component library based on Radix UI and Tailwind CSS; magicui for advanced interactive effects |
-| **Language**              | TypeScript           | Using recommended typescript-eslint configuration to ensure end-to-end type safety                          |
 | **Database**              | PostgreSQL           | Relational database supporting advanced features like JSON fields and full-text search                      |
 
 ## Core Feature Modules
