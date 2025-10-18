@@ -8,8 +8,8 @@ import { TRPCError } from "@trpc/server";
 // Character input schemas
 const createCharacterSchema = z.object({
 	name: z.string().min(1).max(255),
-	avatarUrl: z.string().url().optional(),
-	portraitUrl: z.string().url().optional(),
+	avatarUrl: z.url().optional(),
+	portraitUrl: z.url().optional(),
 	info: z.string().optional(),
 	staticTags: z
 		.object({

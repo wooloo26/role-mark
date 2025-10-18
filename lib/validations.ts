@@ -20,8 +20,8 @@ export const characterStaticTagsSchema = z.object({
 // Character Schemas
 export const createCharacterSchema = z.object({
 	name: z.string().min(1).max(100),
-	avatarUrl: z.string().url().optional(),
-	portraitUrl: z.string().url().optional(),
+	avatarUrl: z.url().optional(),
+	portraitUrl: z.url().optional(),
 	info: z.string().max(5000).optional(),
 	staticTags: characterStaticTagsSchema.optional(),
 	dynamicTags: z.array(z.string().min(1).max(50)).max(50).optional(),
@@ -44,8 +44,8 @@ export const characterSearchSchema = z.object({
 
 // Character Relation Schema
 export const createCharacterRelationSchema = z.object({
-	fromCharacterId: z.string().cuid(),
-	toCharacterId: z.string().cuid(),
+	fromCharacterId: z.cuid(),
+	toCharacterId: z.cuid(),
 	relationType: z.string().min(1).max(50),
 	isBidirectional: z.boolean().optional(),
 });
@@ -53,27 +53,27 @@ export const createCharacterRelationSchema = z.object({
 // Resource Schemas
 export const createResourceSchema = z.object({
 	title: z.string().min(1).max(200),
-	fileUrl: z.string().url(),
+	fileUrl: z.url(),
 	mimeType: z.string().min(1),
-	uploaderId: z.string().cuid().optional(),
+	uploaderId: z.cuid().optional(),
 	dynamicTags: z.array(z.string().min(1).max(50)).max(50).optional(),
-	characterIds: z.array(z.string().cuid()).optional(),
+	characterIds: z.array(z.cuid()).optional(),
 });
 
 export const resourceSearchSchema = z.object({
 	title: z.string().optional(),
 	mimeType: z.string().optional(),
 	dynamicTags: z.array(z.string()).optional(),
-	characterId: z.string().cuid().optional(),
+	characterId: z.cuid().optional(),
 });
 
 // Wiki Page Schemas
 export const createWikiPageSchema = z.object({
 	title: z.string().min(1).max(200),
 	content: z.string().min(1),
-	authorId: z.string().cuid().optional(),
+	authorId: z.cuid().optional(),
 	aiSuggestionEnabled: z.boolean().optional(),
-	characterIds: z.array(z.string().cuid()).optional(),
+	characterIds: z.array(z.cuid()).optional(),
 });
 
 export const updateWikiPageSchema = z.object({
@@ -85,15 +85,15 @@ export const updateWikiPageSchema = z.object({
 export const wikiPageSearchSchema = z.object({
 	title: z.string().optional(),
 	content: z.string().optional(),
-	characterId: z.string().cuid().optional(),
-	authorId: z.string().cuid().optional(),
+	characterId: z.cuid().optional(),
+	authorId: z.cuid().optional(),
 });
 
 // Comment Schemas
 export const createCommentSchema = z.object({
 	content: z.string().min(1).max(2000),
-	authorId: z.string().cuid(),
-	characterIds: z.array(z.string().cuid()).min(1),
+	authorId: z.cuid(),
+	characterIds: z.array(z.cuid()).min(1),
 });
 
 // User Schemas

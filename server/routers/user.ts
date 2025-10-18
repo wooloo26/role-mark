@@ -8,7 +8,7 @@ import { TRPCError } from "@trpc/server";
 
 const registerSchema = z.object({
 	name: z.string().min(1).max(255),
-	email: z.string().email(),
+	email: z.email(),
 	password: z.string().min(6),
 });
 
@@ -26,7 +26,7 @@ const updateSettingsSchema = z.object({
 
 const updateProfileSchema = z.object({
 	name: z.string().min(1).max(255).optional(),
-	image: z.string().url().optional(),
+	image: z.url().optional(),
 });
 
 export const userRouter = createTRPCRouter({

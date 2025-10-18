@@ -7,7 +7,7 @@ import { TRPCError } from "@trpc/server";
 
 const createResourceSchema = z.object({
 	title: z.string().min(1).max(255),
-	fileUrl: z.string().url(),
+	fileUrl: z.url(),
 	mimeType: z.string(),
 	dynamicTags: z.array(z.string()).default([]),
 	characterIds: z.array(z.string()).default([]),
