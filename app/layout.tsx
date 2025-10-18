@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { SessionProvider } from "@/components/providers/session-provider";
-import { ThemeProvider } from "@/components/theme/theme-provider";
+import { ThemeProvider, ThemeScript } from "@/components/theme/theme-provider";
 import { TRPCProvider } from "@/lib/trpc/provider";
 import "./globals.css";
 
@@ -38,6 +38,7 @@ export default function RootLayout({
 					enableSystem
 					disableTransitionOnChange
 				>
+					<ThemeScript />
 					<SessionProvider>
 						<TRPCProvider>
 							<div className="relative flex min-h-screen flex-col">
