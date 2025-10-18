@@ -1,103 +1,133 @@
-import Image from "next/image";
+import { BookOpen, FolderOpen, Tag, Users } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
 
 export default function Home() {
 	return (
-		<div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-			<main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-				<Image
-					className="dark:invert"
-					src="/next.svg"
-					alt="Next.js logo"
-					width={180}
-					height={38}
-					priority
-				/>
-				<ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-					<li className="mb-2 tracking-[-.01em]">
-						Get started by editing{" "}
-						<code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-							app/page.tsx
-						</code>
-						.
-					</li>
-					<li className="tracking-[-.01em]">
-						Save and see your changes instantly.
-					</li>
-				</ol>
-
-				<div className="flex gap-4 items-center flex-col sm:flex-row">
-					<a
-						className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-						href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						<Image
-							className="dark:invert"
-							src="/vercel.svg"
-							alt="Vercel logomark"
-							width={20}
-							height={20}
-						/>
-						Deploy now
-					</a>
-					<a
-						className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-						href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						Read our docs
-					</a>
+		<div className="flex flex-col min-h-screen">
+			{/* Hero Section */}
+			<section className="flex flex-col items-center justify-center px-4 py-20 text-center space-y-6 bg-gradient-to-b from-background to-secondary/20">
+				<h1 className="text-4xl font-bold tracking-tight sm:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
+					Role Mark
+				</h1>
+				<p className="max-w-2xl text-xl text-muted-foreground">
+					A comprehensive platform for managing characters, resources, and wiki
+					content with powerful tagging and organization features.
+				</p>
+				<div className="flex gap-4">
+					<Button asChild size="lg">
+						<Link href="/characters">Explore Characters</Link>
+					</Button>
+					<Button asChild variant="outline" size="lg">
+						<Link href="/wiki">Browse Wiki</Link>
+					</Button>
 				</div>
-			</main>
-			<footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-				<a
-					className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-					href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<Image
-						aria-hidden
-						src="/file.svg"
-						alt="File icon"
-						width={16}
-						height={16}
-					/>
-					Learn
-				</a>
-				<a
-					className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-					href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<Image
-						aria-hidden
-						src="/window.svg"
-						alt="Window icon"
-						width={16}
-						height={16}
-					/>
-					Examples
-				</a>
-				<a
-					className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-					href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<Image
-						aria-hidden
-						src="/globe.svg"
-						alt="Globe icon"
-						width={16}
-						height={16}
-					/>
-					Go to nextjs.org →
-				</a>
-			</footer>
+			</section>
+
+			{/* Features Section */}
+			<section className="container px-4 py-20">
+				<h2 className="text-3xl font-bold text-center mb-12">Core Features</h2>
+				<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+					<Card className="group hover:shadow-lg transition-shadow">
+						<CardHeader>
+							<Users className="h-12 w-12 mb-4 text-primary group-hover:scale-110 transition-transform" />
+							<CardTitle>Character Database</CardTitle>
+							<CardDescription>
+								Comprehensive character profiles with avatars, portraits, and
+								detailed information
+							</CardDescription>
+						</CardHeader>
+						<CardContent>
+							<ul className="space-y-2 text-sm text-muted-foreground">
+								<li>• Static & dynamic tags</li>
+								<li>• Character relationships</li>
+								<li>• Advanced search & filtering</li>
+								<li>• Statistical charts</li>
+							</ul>
+						</CardContent>
+					</Card>
+
+					<Card className="group hover:shadow-lg transition-shadow">
+						<CardHeader>
+							<FolderOpen className="h-12 w-12 mb-4 text-primary group-hover:scale-110 transition-transform" />
+							<CardTitle>Resource Library</CardTitle>
+							<CardDescription>
+								Organize images, videos, audio, and other media files
+							</CardDescription>
+						</CardHeader>
+						<CardContent>
+							<ul className="space-y-2 text-sm text-muted-foreground">
+								<li>• Multi-format support</li>
+								<li>• Character associations</li>
+								<li>• Tag-based indexing</li>
+								<li>• Fast retrieval</li>
+							</ul>
+						</CardContent>
+					</Card>
+
+					<Card className="group hover:shadow-lg transition-shadow">
+						<CardHeader>
+							<BookOpen className="h-12 w-12 mb-4 text-primary group-hover:scale-110 transition-transform" />
+							<CardTitle>Wiki System</CardTitle>
+							<CardDescription>
+								Rich Markdown-based wiki pages with version history
+							</CardDescription>
+						</CardHeader>
+						<CardContent>
+							<ul className="space-y-2 text-sm text-muted-foreground">
+								<li>• Markdown support</li>
+								<li>• AI-assisted editing</li>
+								<li>• Version control</li>
+								<li>• Character linking</li>
+							</ul>
+						</CardContent>
+					</Card>
+
+					<Card className="group hover:shadow-lg transition-shadow">
+						<CardHeader>
+							<Tag className="h-12 w-12 mb-4 text-primary group-hover:scale-110 transition-transform" />
+							<CardTitle>Tagging System</CardTitle>
+							<CardDescription>
+								Powerful organization with static and dynamic tags
+							</CardDescription>
+						</CardHeader>
+						<CardContent>
+							<ul className="space-y-2 text-sm text-muted-foreground">
+								<li>• Custom tag creation</li>
+								<li>• Tag-based filtering</li>
+								<li>• Tag aggregation</li>
+								<li>• Smart search</li>
+							</ul>
+						</CardContent>
+					</Card>
+				</div>
+			</section>
+
+			{/* CTA Section */}
+			<section className="container px-4 py-20">
+				<div className="rounded-lg bg-primary/5 border p-8 text-center space-y-4">
+					<h2 className="text-3xl font-bold">Ready to get started?</h2>
+					<p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+						Sign up now to start organizing your characters, resources, and wiki
+						content.
+					</p>
+					<div className="flex justify-center gap-4">
+						<Button asChild size="lg">
+							<Link href="/register">Create Account</Link>
+						</Button>
+						<Button asChild variant="outline" size="lg">
+							<Link href="/login">Sign In</Link>
+						</Button>
+					</div>
+				</div>
+			</section>
 		</div>
 	);
 }

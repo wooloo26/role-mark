@@ -2,7 +2,15 @@
  * User router - handles user settings and profile operations
  */
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { hash } from "bcryptjs";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
+import { TRPCError } from "@trpc/server";
+
+const registerSchema = z.object({
+	name: z.string().min(1).max(255),
+	email: z.string().email(),
+	password: z.string().min(6),
+});
 
 const updateSettingsSchema = z.object({
 	showNSFW: z.boolean().optional(),
@@ -22,6 +30,42 @@ const updateProfileSchema = z.object({
 });
 
 export const userRouter = createTRPCRouter({
+	// Register new user
+	register: publicProcedure
+		.input(registerSchema)
+		.mutation(async ({ ctx, input }) => {
+			// Check if user already exists
+			const existingUser = await ctx.prisma.user.findUnique({
+				where: { email: input.email },
+			});
+
+			if (existingUser) {
+				throw new TRPCError({
+					code: "CONFLICT",
+					message: "User with this email already exists",
+				});
+			}
+
+			// Hash password
+			const hashedPassword = await hash(input.password, 10);
+
+			// Create user
+			const user = await ctx.prisma.user.create({
+				data: {
+					name: input.name,
+					email: input.email,
+					password: hashedPassword,
+				},
+				select: {
+					id: true,
+					name: true,
+					email: true,
+				},
+			});
+
+			return user;
+		}),
+
 	// Get current user profile
 	getProfile: protectedProcedure.query(async ({ ctx }) => {
 		return await ctx.prisma.user.findUnique({
