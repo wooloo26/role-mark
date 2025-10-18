@@ -1,6 +1,7 @@
 "use client";
 
-import { useId } from "react";
+import { useCallback, useEffect, useId, useState } from "react";
+import { CustomPaletteEditor } from "@/components/theme/custom-palette-editor";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -19,15 +20,53 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useThemeSettings } from "@/lib/hooks/use-theme-settings";
+import { getAllPalettes, isCustomPalette } from "@/lib/theme-config";
 
 export function ThemeCustomizer() {
 	const { componentTheme, updateComponentTheme, resetToDefaults, isLoaded } =
 		useThemeSettings();
+	const [availablePalettes, setAvailablePalettes] = useState<
+		Record<string, string>
+	>({});
 
 	const radiusId = useId();
 	const fontSizeId = useId();
 	const cardStyleId = useId();
+	const colorPaletteId = useId();
 	const reducedMotionId = useId();
+
+	const loadPalettes = useCallback(() => {
+		const allPalettes = getAllPalettes();
+		const paletteLabels: Record<string, string> = {};
+
+		// Built-in palettes with nice labels
+		paletteLabels.default = "Default (Neutral)";
+		paletteLabels.ocean = "Ocean (Blue)";
+		paletteLabels.forest = "Forest (Green)";
+		paletteLabels.sunset = "Sunset (Orange)";
+		paletteLabels.purple = "Purple (Violet)";
+		paletteLabels.rose = "Rose (Pink)";
+
+		// Add custom palettes
+		Object.keys(allPalettes).forEach((name) => {
+			if (isCustomPalette(name)) {
+				paletteLabels[name] = `${name} (Custom)`;
+			}
+		});
+
+		setAvailablePalettes(paletteLabels);
+	}, []);
+
+	// Load available palettes
+	useEffect(() => {
+		loadPalettes();
+	}, [loadPalettes]);
+
+	const handlePaletteCreated = (paletteName: string) => {
+		loadPalettes();
+		// Automatically switch to the newly created palette
+		updateComponentTheme({ colorPalette: paletteName });
+	};
 
 	if (!isLoaded) {
 		return <div className="text-sm text-muted-foreground">Loading...</div>;
@@ -35,6 +74,67 @@ export function ThemeCustomizer() {
 
 	return (
 		<div className="space-y-6">
+			{/* Color Palette */}
+			<Card>
+				<CardHeader>
+					<CardTitle>Color Theme</CardTitle>
+					<CardDescription>
+						Choose a color palette (works with both light and dark modes)
+					</CardDescription>
+				</CardHeader>
+				<CardContent>
+					<div className="space-y-4">
+						<div className="flex items-center justify-between">
+							<Label htmlFor={colorPaletteId}>Color Palette</Label>
+							<Select
+								value={componentTheme.colorPalette}
+								onValueChange={(value) =>
+									updateComponentTheme({
+										colorPalette: value as typeof componentTheme.colorPalette,
+									})
+								}
+							>
+								<SelectTrigger id={colorPaletteId} className="w-[180px]">
+									<SelectValue />
+								</SelectTrigger>
+								<SelectContent>
+									{Object.entries(availablePalettes).map(([value, label]) => (
+										<SelectItem key={value} value={value}>
+											{label}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</div>
+
+						{/* Custom Palette Button */}
+						<CustomPaletteEditor onPaletteCreated={handlePaletteCreated} />
+
+						{/* Preview */}
+						<div className="pt-4 space-y-2">
+							<p className="text-sm font-medium">Preview:</p>
+							<div className="grid grid-cols-3 gap-2">
+								<div className="h-16 bg-primary rounded-md flex items-center justify-center">
+									<span className="text-xs text-primary-foreground font-medium">
+										Primary
+									</span>
+								</div>
+								<div className="h-16 bg-secondary rounded-md flex items-center justify-center">
+									<span className="text-xs text-secondary-foreground font-medium">
+										Secondary
+									</span>
+								</div>
+								<div className="h-16 bg-accent rounded-md flex items-center justify-center">
+									<span className="text-xs text-accent-foreground font-medium">
+										Accent
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</CardContent>
+			</Card>
+
 			{/* Border Radius */}
 			<Card>
 				<CardHeader>
