@@ -6,7 +6,7 @@
 export type ColorTheme = "light" | "dark" | "system"
 
 // Available color palettes (each has light and dark variants)
-export type ColorPalette = "default" | string // Allow custom palette names
+export type ColorPalette = "default" | "festive" | string // Allow custom palette names
 
 export interface ComponentTheme {
 	// Border radius settings
@@ -110,6 +110,46 @@ export const colorPalettes: Record<ColorPalette, PaletteColors> = {
 			border: "oklch(0.3 0.02 240)",
 			input: "oklch(0.3 0.02 240)",
 			ring: "oklch(0.68 0.154 221.72)",
+		},
+	},
+	festive: {
+		light: {
+			background: "oklch(0.98 0.02 50)",
+			foreground: "oklch(0.2 0.05 30)",
+			card: "oklch(1 0.01 60)",
+			cardForeground: "oklch(0.25 0.05 30)",
+			popover: "oklch(1 0.01 60)",
+			popoverForeground: "oklch(0.25 0.05 30)",
+			primary: "oklch(0.55 0.22 25)",
+			primaryForeground: "oklch(0.98 0.01 60)",
+			secondary: "oklch(0.70 0.15 70)",
+			secondaryForeground: "oklch(0.2 0.05 30)",
+			muted: "oklch(0.95 0.03 50)",
+			mutedForeground: "oklch(0.5 0.05 30)",
+			accent: "oklch(0.65 0.18 60)",
+			accentForeground: "oklch(0.15 0.05 30)",
+			border: "oklch(0.88 0.05 50)",
+			input: "oklch(0.88 0.05 50)",
+			ring: "oklch(0.55 0.22 25)",
+		},
+		dark: {
+			background: "oklch(0.15 0.04 20)",
+			foreground: "oklch(0.95 0.03 50)",
+			card: "oklch(0.20 0.05 25)",
+			cardForeground: "oklch(0.95 0.03 50)",
+			popover: "oklch(0.20 0.05 25)",
+			popoverForeground: "oklch(0.95 0.03 50)",
+			primary: "oklch(0.60 0.20 30)",
+			primaryForeground: "oklch(0.98 0.01 60)",
+			secondary: "oklch(0.65 0.15 65)",
+			secondaryForeground: "oklch(0.15 0.04 20)",
+			muted: "oklch(0.30 0.05 30)",
+			mutedForeground: "oklch(0.70 0.05 50)",
+			accent: "oklch(0.70 0.16 55)",
+			accentForeground: "oklch(0.15 0.04 20)",
+			border: "oklch(0.35 0.06 25)",
+			input: "oklch(0.35 0.06 25)",
+			ring: "oklch(0.60 0.20 30)",
 		},
 	},
 }

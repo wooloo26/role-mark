@@ -41,6 +41,7 @@ export function ThemeCustomizer() {
 
 		// Built-in palettes with nice labels
 		paletteLabels.default = "Default (Neutral)"
+		paletteLabels.festive = "Festive (Red & Green)"
 
 		// Add custom palettes
 		Object.keys(allPalettes).forEach((name) => {
