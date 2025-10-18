@@ -27,21 +27,26 @@ export function Header() {
 	const { data: session } = useSession()
 
 	return (
-		<header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+		<header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 shadow-sm">
 			<div className="container mx-auto flex h-16 items-center px-4">
 				<div className="mr-4 flex">
-					<Link href="/" className="mr-6 flex items-center space-x-2">
-						<span className="font-bold text-xl">Role Mark</span>
+					<Link
+						href="/"
+						className="mr-8 flex items-center space-x-2 group transition-all"
+					>
+						<span className="font-bold text-xl bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent group-hover:from-primary/80 group-hover:to-primary/40 transition-all">
+							Role Mark
+						</span>
 					</Link>
-					<nav className="flex items-center space-x-6 text-sm font-medium">
+					<nav className="hidden md:flex items-center space-x-1 text-sm font-medium">
 						{navigation.map((item) => (
 							<Link
 								key={item.href}
 								href={item.href}
-								className={`transition-colors hover:text-foreground/80 ${
+								className={`px-4 py-2 rounded-md transition-all ${
 									pathname === item.href
-										? "text-foreground"
-										: "text-foreground/60"
+										? "text-foreground bg-secondary"
+										: "text-foreground/60 hover:text-foreground hover:bg-secondary/50"
 								}`}
 							>
 								{item.name}
@@ -49,7 +54,7 @@ export function Header() {
 						))}
 					</nav>
 				</div>
-				<div className="ml-auto flex items-center space-x-4">
+				<div className="ml-auto flex items-center space-x-2">
 					<ThemeToggle />
 					{session ? (
 						<DropdownMenu>
