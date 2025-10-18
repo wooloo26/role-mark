@@ -1,0 +1,238 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// PERSONAL DATA (User-Related)
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?   // For credentials authentication
+  settings      Json?     // Theme preferences, NSFW toggle, etc.
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // NextAuth.js relations
+  accounts      Account[]
+  sessions      Session[]
+
+  // User content relations
+  comments      Comment[]
+  resources     Resource[] @relation("ResourceUploader")
+  wikiPages     WikiPage[] @relation("WikiPageAuthor")
+
+  @@map("users")
+}
+
+// NextAuth.js models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model Comment {
+  id         String   @id @default(cuid())
+  content    String   @db.Text
+  authorId   String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  author     User                  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  characters CharacterOnComment[]
+
+  @@index([authorId])
+  @@index([createdAt])
+  @@map("comments")
+}
+
+// ============================================
+// PUBLIC DATA
+// ============================================
+
+model Character {
+  id          String   @id @default(cuid())
+  name        String
+  avatarUrl   String?
+  portraitUrl String?
+  info        String?  @db.Text // Summary text (Markdown-supported)
+  staticTags  Json?    // Structured fields: { height: number, weight: number, birthday: Date }
+  dynamicTags String[] // User-defined keyword tags
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Many-to-many relations
+  resources        CharacterOnResource[]
+  wikiPages        CharacterOnWikiPage[]
+  comments         CharacterOnComment[]
+
+  // Self-referencing relationship
+  relationsFrom    CharacterRelation[]   @relation("CharacterFrom")
+  relationsTo      CharacterRelation[]   @relation("CharacterTo")
+
+  @@index([name])
+  @@index([dynamicTags])
+  @@map("characters")
+}
+
+model CharacterRelation {
+  id              String   @id @default(cuid())
+  fromCharacterId String
+  toCharacterId   String
+  relationType    String   // e.g., "siblings", "rivals", "friends"
+  isBidirectional Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  fromCharacter Character @relation("CharacterFrom", fields: [fromCharacterId], references: [id], onDelete: Cascade)
+  toCharacter   Character @relation("CharacterTo", fields: [toCharacterId], references: [id], onDelete: Cascade)
+
+  @@unique([fromCharacterId, toCharacterId, relationType])
+  @@index([fromCharacterId])
+  @@index([toCharacterId])
+  @@map("character_relations")
+}
+
+model Resource {
+  id          String   @id @default(cuid())
+  title       String
+  fileUrl     String
+  mimeType    String
+  uploaderId  String?
+  dynamicTags String[] // User-defined keyword tags
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  uploader   User?                 @relation("ResourceUploader", fields: [uploaderId], references: [id], onDelete: SetNull)
+  characters CharacterOnResource[]
+
+  @@index([title])
+  @@index([mimeType])
+  @@index([dynamicTags])
+  @@index([uploaderId])
+  @@map("resources")
+}
+
+model WikiPage {
+  id                   String   @id @default(cuid())
+  title                String
+  content              String   @db.Text // Markdown content
+  authorId             String?
+  aiSuggestionEnabled  Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  author     User?                 @relation("WikiPageAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  characters CharacterOnWikiPage[]
+  versions   WikiPageVersion[]
+
+  @@index([title])
+  @@index([authorId])
+  @@map("wiki_pages")
+}
+
+model WikiPageVersion {
+  id         String   @id @default(cuid())
+  wikiPageId String
+  title      String
+  content    String   @db.Text
+  version    Int
+  createdAt  DateTime @default(now())
+
+  wikiPage WikiPage @relation(fields: [wikiPageId], references: [id], onDelete: Cascade)
+
+  @@unique([wikiPageId, version])
+  @@index([wikiPageId])
+  @@map("wiki_page_versions")
+}
+
+// ============================================
+// JOIN TABLES (Many-to-Many Relations)
+// ============================================
+
+model CharacterOnResource {
+  characterId String
+  resourceId  String
+  assignedAt  DateTime @default(now())
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  resource  Resource  @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  @@id([characterId, resourceId])
+  @@index([characterId])
+  @@index([resourceId])
+  @@map("character_on_resource")
+}
+
+model CharacterOnWikiPage {
+  characterId String
+  wikiPageId  String
+  assignedAt  DateTime @default(now())
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  wikiPage  WikiPage  @relation(fields: [wikiPageId], references: [id], onDelete: Cascade)
+
+  @@id([characterId, wikiPageId])
+  @@index([characterId])
+  @@index([wikiPageId])
+  @@map("character_on_wiki_page")
+}
+
+model CharacterOnComment {
+  characterId String
+  commentId   String
+  assignedAt  DateTime @default(now())
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  comment   Comment   @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@id([characterId, commentId])
+  @@index([characterId])
+  @@index([commentId])
+  @@map("character_on_comment")
+}
