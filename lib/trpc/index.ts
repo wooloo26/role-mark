@@ -3,11 +3,11 @@
  */
 
 // Types
-export type { AppRouter } from "@/server/routers/_app";
+export type { AppRouter } from "@/server/routers/_app"
 // Client-side hooks
-export { trpc } from "./client";
+export { trpc } from "./client"
 
 // Provider component
-export { TRPCProvider } from "./provider";
+export { TRPCProvider } from "./provider"
 // Server-side caller
-export { api } from "./server";
+export { api } from "./server"

@@ -2,16 +2,16 @@
  * User router - handles user settings and profile operations
  */
 
-import { TRPCError } from "@trpc/server";
-import { hash } from "bcryptjs";
-import { z } from "zod";
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
+import { TRPCError } from "@trpc/server"
+import { hash } from "bcryptjs"
+import { z } from "zod"
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc"
 
 const registerSchema = z.object({
 	name: z.string().min(1).max(255),
 	email: z.email(),
 	password: z.string().min(6),
-});
+})
 
 const updateSettingsSchema = z.object({
 	showNSFW: z.boolean().optional(),
@@ -28,12 +28,12 @@ const updateSettingsSchema = z.object({
 				.optional(),
 		})
 		.optional(),
-});
+})
 
 const updateProfileSchema = z.object({
 	name: z.string().min(1).max(255).optional(),
 	image: z.url().optional(),
-});
+})
 
 export const userRouter = createTRPCRouter({
 	// Register new user
@@ -43,17 +43,17 @@ export const userRouter = createTRPCRouter({
 			// Check if user already exists
 			const existingUser = await ctx.prisma.user.findUnique({
 				where: { email: input.email },
-			});
+			})
 
 			if (existingUser) {
 				throw new TRPCError({
 					code: "CONFLICT",
 					message: "User with this email already exists",
-				});
+				})
 			}
 
 			// Hash password
-			const hashedPassword = await hash(input.password, 10);
+			const hashedPassword = await hash(input.password, 10)
 
 			// Create user
 			const user = await ctx.prisma.user.create({
@@ -67,9 +67,9 @@ export const userRouter = createTRPCRouter({
 					name: true,
 					email: true,
 				},
-			});
+			})
 
-			return user;
+			return user
 		}),
 
 	// Get current user profile
@@ -91,7 +91,7 @@ export const userRouter = createTRPCRouter({
 					},
 				},
 			},
-		});
+		})
 	}),
 
 	// Update user settings
@@ -101,9 +101,9 @@ export const userRouter = createTRPCRouter({
 			const currentUser = await ctx.prisma.user.findUnique({
 				where: { id: ctx.session.user.id },
 				select: { settings: true },
-			});
+			})
 
-			const currentSettings = (currentUser?.settings as typeof input) || {};
+			const currentSettings = (currentUser?.settings as typeof input) || {}
 			const mergedSettings = {
 				...currentSettings,
 				...(input.showNSFW !== undefined && { showNSFW: input.showNSFW }),
@@ -113,7 +113,7 @@ export const userRouter = createTRPCRouter({
 						...input.theme,
 					},
 				}),
-			};
+			}
 			return await ctx.prisma.user.update({
 				where: { id: ctx.session.user.id },
 				data: {
@@ -123,7 +123,7 @@ export const userRouter = createTRPCRouter({
 					id: true,
 					settings: true,
 				},
-			});
+			})
 		}),
 
 	// Update user profile
@@ -142,7 +142,7 @@ export const userRouter = createTRPCRouter({
 					email: true,
 					image: true,
 				},
-			});
+			})
 		}),
 
 	// Get user statistics
@@ -157,12 +157,12 @@ export const userRouter = createTRPCRouter({
 			ctx.prisma.wikiPage.count({
 				where: { authorId: ctx.session.user.id },
 			}),
-		]);
+		])
 
 		return {
 			commentCount,
 			resourceCount,
 			wikiPageCount,
-		};
+		}
 	}),
-});
+})

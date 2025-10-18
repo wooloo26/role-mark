@@ -1,18 +1,18 @@
-"use client";
+"use client"
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { Button } from "@/components/ui/button";
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Loader2 } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { Button } from "@/components/ui/button"
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card";
+} from "@/components/ui/card"
 import {
 	Form,
 	FormControl,
@@ -21,23 +21,23 @@ import {
 	FormItem,
 	FormLabel,
 	FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { trpc } from "@/lib/trpc/client";
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { trpc } from "@/lib/trpc/client"
 
 const characterSchema = z.object({
 	name: z.string().min(1, "Name is required").max(100),
 	info: z.string().max(500).optional(),
 	avatarUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
 	dynamicTags: z.string().optional(),
-});
+})
 
-type CharacterFormData = z.infer<typeof characterSchema>;
+type CharacterFormData = z.infer<typeof characterSchema>
 
 export default function NewCharacterPage() {
-	const router = useRouter();
-	const utils = trpc.useUtils();
+	const router = useRouter()
+	const utils = trpc.useUtils()
 
 	const form = useForm<CharacterFormData>({
 		resolver: zodResolver(characterSchema),
@@ -47,14 +47,14 @@ export default function NewCharacterPage() {
 			avatarUrl: "",
 			dynamicTags: "",
 		},
-	});
+	})
 
 	const createCharacter = trpc.character.create.useMutation({
 		onSuccess: (data) => {
-			utils.character.search.invalidate();
-			router.push(`/characters/${data.id}`);
+			utils.character.search.invalidate()
+			router.push(`/characters/${data.id}`)
 		},
-	});
+	})
 
 	const onSubmit = (data: CharacterFormData) => {
 		const tags = data.dynamicTags
@@ -62,15 +62,15 @@ export default function NewCharacterPage() {
 					.split(",")
 					.map((tag) => tag.trim())
 					.filter(Boolean)
-			: [];
+			: []
 
 		createCharacter.mutate({
 			name: data.name,
 			info: data.info || undefined,
 			avatarUrl: data.avatarUrl || undefined,
 			dynamicTags: tags.length > 0 ? tags : undefined,
-		});
-	};
+		})
+	}
 
 	return (
 		<div className="container max-w-2xl py-8 mx-auto">
@@ -193,5 +193,5 @@ export default function NewCharacterPage() {
 				</CardContent>
 			</Card>
 		</div>
-	);
+	)
 }

@@ -1,10 +1,10 @@
-"use client";
+"use client"
 
-import { Loader2 } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import React, { useState } from "react"
+import { Button } from "@/components/ui/button"
 import {
 	Card,
 	CardContent,
@@ -12,48 +12,48 @@ import {
 	CardFooter,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { trpc } from "@/lib/trpc/client";
+} from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { trpc } from "@/lib/trpc/client"
 
 export default function RegisterPage() {
-	const router = useRouter();
-	const [name, setName] = useState("");
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
-	const [confirmPassword, setConfirmPassword] = useState("");
-	const [error, setError] = useState("");
+	const router = useRouter()
+	const [name, setName] = useState("")
+	const [email, setEmail] = useState("")
+	const [password, setPassword] = useState("")
+	const [confirmPassword, setConfirmPassword] = useState("")
+	const [error, setError] = useState("")
 
 	const registerMutation = trpc.user.register.useMutation({
 		onSuccess: () => {
-			router.push("/login?registered=true");
+			router.push("/login?registered=true")
 		},
 		onError: (error: { message: string }) => {
-			setError(error.message);
+			setError(error.message)
 		},
-	});
+	})
 
 	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		setError("");
+		e.preventDefault()
+		setError("")
 
 		if (password !== confirmPassword) {
-			setError("Passwords do not match");
-			return;
+			setError("Passwords do not match")
+			return
 		}
 
 		if (password.length < 6) {
-			setError("Password must be at least 6 characters");
-			return;
+			setError("Password must be at least 6 characters")
+			return
 		}
 
 		registerMutation.mutate({
 			name,
 			email,
 			password,
-		});
-	};
+		})
+	}
 
 	return (
 		<div className="container flex items-center justify-center min-h-[calc(100vh-200px)] py-8">
@@ -139,5 +139,5 @@ export default function RegisterPage() {
 				</form>
 			</Card>
 		</div>
-	);
+	)
 }

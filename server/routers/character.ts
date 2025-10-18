@@ -2,9 +2,9 @@
  * Character router - handles all character-related operations
  */
 
-import { TRPCError } from "@trpc/server";
-import { z } from "zod";
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
+import { TRPCError } from "@trpc/server"
+import { z } from "zod"
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc"
 
 // Character input schemas
 const createCharacterSchema = z.object({
@@ -20,11 +20,11 @@ const createCharacterSchema = z.object({
 		})
 		.optional(),
 	dynamicTags: z.array(z.string()).default([]),
-});
+})
 
 const updateCharacterSchema = createCharacterSchema.partial().extend({
 	id: z.string(),
-});
+})
 
 const characterSearchSchema = z.object({
 	name: z.string().optional(),
@@ -39,14 +39,14 @@ const characterSearchSchema = z.object({
 		.optional(),
 	limit: z.number().min(1).max(100).default(20),
 	offset: z.number().min(0).default(0),
-});
+})
 
 const createRelationSchema = z.object({
 	fromCharacterId: z.string(),
 	toCharacterId: z.string(),
 	relationType: z.string().min(1).max(100),
 	isBidirectional: z.boolean().default(false),
-});
+})
 
 export const characterRouter = createTRPCRouter({
 	// Get character by ID
@@ -104,16 +104,16 @@ export const characterRouter = createTRPCRouter({
 						},
 					},
 				},
-			});
+			})
 
 			if (!character) {
 				throw new TRPCError({
 					code: "NOT_FOUND",
 					message: "Character not found",
-				});
+				})
 			}
 
-			return character;
+			return character
 		}),
 
 	// Search/list characters
@@ -122,44 +122,44 @@ export const characterRouter = createTRPCRouter({
 		.query(async ({ ctx, input }) => {
 			const where: {
 				name?: {
-					contains: string;
-					mode: "insensitive";
-				};
+					contains: string
+					mode: "insensitive"
+				}
 				dynamicTags?: {
-					hasEvery: string[];
-				};
-			} = {};
+					hasEvery: string[]
+				}
+			} = {}
 
 			if (input.name) {
 				where.name = {
 					contains: input.name,
 					mode: "insensitive",
-				};
+				}
 			}
 
 			if (input.dynamicTags && input.dynamicTags.length > 0) {
 				where.dynamicTags = {
 					hasEvery: input.dynamicTags,
-				};
+				}
 			}
 
 			// Handle static tags filtering
 			if (input.staticTags) {
 				const staticTagsFilter: {
-					path?: string[];
-					gte?: number;
-					lte?: number;
-				} = {};
+					path?: string[]
+					gte?: number
+					lte?: number
+				} = {}
 				if (
 					input.staticTags.heightMin !== undefined ||
 					input.staticTags.heightMax !== undefined
 				) {
-					staticTagsFilter.path = ["height"];
+					staticTagsFilter.path = ["height"]
 					if (input.staticTags.heightMin !== undefined) {
-						staticTagsFilter.gte = input.staticTags.heightMin;
+						staticTagsFilter.gte = input.staticTags.heightMin
 					}
 					if (input.staticTags.heightMax !== undefined) {
-						staticTagsFilter.lte = input.staticTags.heightMax;
+						staticTagsFilter.lte = input.staticTags.heightMax
 					}
 				}
 			}
@@ -183,13 +183,13 @@ export const characterRouter = createTRPCRouter({
 					},
 				}),
 				ctx.prisma.character.count({ where }),
-			]);
+			])
 
 			return {
 				characters,
 				total,
 				hasMore: input.offset + input.limit < total,
-			};
+			}
 		}),
 
 	// Create character (protected)
@@ -205,14 +205,14 @@ export const characterRouter = createTRPCRouter({
 					staticTags: input.staticTags,
 					dynamicTags: input.dynamicTags,
 				},
-			});
+			})
 		}),
 
 	// Update character (protected)
 	update: protectedProcedure
 		.input(updateCharacterSchema)
 		.mutation(async ({ ctx, input }) => {
-			const { id, ...data } = input;
+			const { id, ...data } = input
 
 			return await ctx.prisma.character.update({
 				where: { id },
@@ -230,7 +230,7 @@ export const characterRouter = createTRPCRouter({
 						dynamicTags: data.dynamicTags,
 					}),
 				},
-			});
+			})
 		}),
 
 	// Delete character (protected)
@@ -239,7 +239,7 @@ export const characterRouter = createTRPCRouter({
 		.mutation(async ({ ctx, input }) => {
 			return await ctx.prisma.character.delete({
 				where: { id: input.id },
-			});
+			})
 		}),
 
 	// Create character relation
@@ -253,7 +253,7 @@ export const characterRouter = createTRPCRouter({
 					relationType: input.relationType,
 					isBidirectional: input.isBidirectional,
 				},
-			});
+			})
 		}),
 
 	// Delete character relation
@@ -262,6 +262,6 @@ export const characterRouter = createTRPCRouter({
 		.mutation(async ({ ctx, input }) => {
 			return await ctx.prisma.characterRelation.delete({
 				where: { id: input.id },
-			});
+			})
 		}),
-});
+})

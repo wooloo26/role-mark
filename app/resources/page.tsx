@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import {
 	File,
@@ -8,37 +8,37 @@ import {
 	Loader2,
 	Plus,
 	Search,
-} from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+} from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
+import { useState } from "react"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { trpc } from "@/lib/trpc/client";
+} from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { trpc } from "@/lib/trpc/client"
 
 function getFileIcon(mimeType: string) {
-	if (mimeType.startsWith("image/")) return FileImage;
-	if (mimeType.startsWith("video/")) return FileVideo;
-	if (mimeType.startsWith("audio/")) return FileAudio;
-	return File;
+	if (mimeType.startsWith("image/")) return FileImage
+	if (mimeType.startsWith("video/")) return FileVideo
+	if (mimeType.startsWith("audio/")) return FileAudio
+	return File
 }
 
 export default function ResourcesPage() {
-	const [searchQuery, setSearchQuery] = useState("");
+	const [searchQuery, setSearchQuery] = useState("")
 	const { data, isLoading } = trpc.resource.search.useQuery({
 		title: searchQuery,
 		limit: 50,
-	});
+	})
 
-	const resources = data?.resources ?? [];
+	const resources = data?.resources ?? []
 
 	return (
 		<div className="container py-8">
@@ -78,8 +78,8 @@ export default function ResourcesPage() {
 				) : (
 					<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 						{resources.map((resource) => {
-							const FileIcon = getFileIcon(resource.mimeType);
-							const isImage = resource.mimeType.startsWith("image/");
+							const FileIcon = getFileIcon(resource.mimeType)
+							const isImage = resource.mimeType.startsWith("image/")
 
 							return (
 								<Link
@@ -135,7 +135,7 @@ export default function ResourcesPage() {
 											)}
 									</Card>
 								</Link>
-							);
+							)
 						})}
 					</div>
 				)}
@@ -157,5 +157,5 @@ export default function ResourcesPage() {
 				)}
 			</div>
 		</div>
-	);
+	)
 }

@@ -1,25 +1,25 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import type { ComponentTheme, ThemeSettings } from "@/lib/theme-config";
+import { useEffect, useState } from "react"
+import type { ComponentTheme, ThemeSettings } from "@/lib/theme-config"
 import {
 	applyComponentTheme,
 	defaultThemeSettings,
 	getStoredThemeSettings,
 	saveThemeSettings,
-} from "@/lib/theme-config";
+} from "@/lib/theme-config"
 
 export function useThemeSettings() {
-	const [settings, setSettings] = useState<ThemeSettings>(defaultThemeSettings);
-	const [isLoaded, setIsLoaded] = useState(false);
+	const [settings, setSettings] = useState<ThemeSettings>(defaultThemeSettings)
+	const [isLoaded, setIsLoaded] = useState(false)
 
 	// Load settings on mount
 	useEffect(() => {
-		const stored = getStoredThemeSettings();
-		setSettings(stored);
-		applyComponentTheme(stored.componentTheme);
-		setIsLoaded(true);
-	}, []);
+		const stored = getStoredThemeSettings()
+		setSettings(stored)
+		applyComponentTheme(stored.componentTheme)
+		setIsLoaded(true)
+	}, [])
 
 	// Update component theme
 	const updateComponentTheme = (updates: Partial<ComponentTheme>): void => {
@@ -29,18 +29,18 @@ export function useThemeSettings() {
 				...settings.componentTheme,
 				...updates,
 			},
-		};
-		setSettings(newSettings);
-		saveThemeSettings(newSettings);
-		applyComponentTheme(newSettings.componentTheme);
-	};
+		}
+		setSettings(newSettings)
+		saveThemeSettings(newSettings)
+		applyComponentTheme(newSettings.componentTheme)
+	}
 
 	// Reset to defaults
 	const resetToDefaults = (): void => {
-		setSettings(defaultThemeSettings);
-		saveThemeSettings(defaultThemeSettings);
-		applyComponentTheme(defaultThemeSettings.componentTheme);
-	};
+		setSettings(defaultThemeSettings)
+		saveThemeSettings(defaultThemeSettings)
+		applyComponentTheme(defaultThemeSettings.componentTheme)
+	}
 
 	return {
 		settings,
@@ -48,5 +48,5 @@ export function useThemeSettings() {
 		updateComponentTheme,
 		resetToDefaults,
 		componentTheme: settings.componentTheme,
-	};
+	}
 }

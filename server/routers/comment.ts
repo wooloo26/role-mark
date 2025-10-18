@@ -2,19 +2,19 @@
  * Comment router - handles all comment operations
  */
 
-import { TRPCError } from "@trpc/server";
-import { z } from "zod";
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
+import { TRPCError } from "@trpc/server"
+import { z } from "zod"
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc"
 
 const createCommentSchema = z.object({
 	content: z.string().min(1).max(5000),
 	characterIds: z.array(z.string()).min(1),
-});
+})
 
 const updateCommentSchema = z.object({
 	id: z.string(),
 	content: z.string().min(1).max(5000),
-});
+})
 
 export const commentRouter = createTRPCRouter({
 	// Get comments by character ID
@@ -71,13 +71,13 @@ export const commentRouter = createTRPCRouter({
 						},
 					},
 				}),
-			]);
+			])
 
 			return {
 				comments,
 				total,
 				hasMore: input.offset + input.limit < total,
-			};
+			}
 		}),
 
 	// Create comment (protected)
@@ -114,7 +114,7 @@ export const commentRouter = createTRPCRouter({
 						},
 					},
 				},
-			});
+			})
 		}),
 
 	// Update comment (protected)
@@ -125,20 +125,20 @@ export const commentRouter = createTRPCRouter({
 			const comment = await ctx.prisma.comment.findUnique({
 				where: { id: input.id },
 				select: { authorId: true },
-			});
+			})
 
 			if (!comment) {
 				throw new TRPCError({
 					code: "NOT_FOUND",
 					message: "Comment not found",
-				});
+				})
 			}
 
 			if (comment.authorId !== ctx.session.user.id) {
 				throw new TRPCError({
 					code: "FORBIDDEN",
 					message: "You can only edit your own comments",
-				});
+				})
 			}
 
 			return await ctx.prisma.comment.update({
@@ -160,7 +160,7 @@ export const commentRouter = createTRPCRouter({
 						},
 					},
 				},
-			});
+			})
 		}),
 
 	// Delete comment (protected)
@@ -171,24 +171,24 @@ export const commentRouter = createTRPCRouter({
 			const comment = await ctx.prisma.comment.findUnique({
 				where: { id: input.id },
 				select: { authorId: true },
-			});
+			})
 
 			if (!comment) {
 				throw new TRPCError({
 					code: "NOT_FOUND",
 					message: "Comment not found",
-				});
+				})
 			}
 
 			if (comment.authorId !== ctx.session.user.id) {
 				throw new TRPCError({
 					code: "FORBIDDEN",
 					message: "You can only delete your own comments",
-				});
+				})
 			}
 
 			return await ctx.prisma.comment.delete({
 				where: { id: input.id },
-			});
+			})
 		}),
-});
+})

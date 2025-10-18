@@ -1,11 +1,11 @@
-"use client";
+"use client"
 
-import { Loader2 } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
-import React from "react";
-import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { signIn } from "next-auth/react"
+import React from "react"
+import { Button } from "@/components/ui/button"
 import {
 	Card,
 	CardContent,
@@ -13,42 +13,42 @@ import {
 	CardFooter,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 export default function LoginPage() {
-	const router = useRouter();
-	const [email, setEmail] = React.useState("");
-	const [password, setPassword] = React.useState("");
-	const [isLoading, setIsLoading] = React.useState(false);
-	const [error, setError] = React.useState("");
+	const router = useRouter()
+	const [email, setEmail] = React.useState("")
+	const [password, setPassword] = React.useState("")
+	const [isLoading, setIsLoading] = React.useState(false)
+	const [error, setError] = React.useState("")
 
 	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		setIsLoading(true);
-		setError("");
+		e.preventDefault()
+		setIsLoading(true)
+		setError("")
 
 		try {
 			const result = await signIn("credentials", {
 				email,
 				password,
 				redirect: false,
-			});
+			})
 
 			if (result?.error) {
-				setError("Invalid email or password");
+				setError("Invalid email or password")
 			} else {
-				router.push("/");
-				router.refresh();
+				router.push("/")
+				router.refresh()
 			}
 		} catch (error) {
-			setError("An error occurred. Please try again.");
-			console.error(error);
+			setError("An error occurred. Please try again.")
+			console.error(error)
 		} finally {
-			setIsLoading(false);
+			setIsLoading(false)
 		}
-	};
+	}
 
 	return (
 		<div className="container flex items-center justify-center min-h-[calc(100vh-200px)] py-8">
@@ -105,5 +105,5 @@ export default function LoginPage() {
 				</form>
 			</Card>
 		</div>
-	);
+	)
 }

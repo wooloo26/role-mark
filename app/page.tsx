@@ -1,17 +1,17 @@
-"use client";
+"use client"
 
-import { BookOpen, FolderOpen, Settings2, Tag, Users } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
-import { ThemeCustomizer } from "@/components/theme/theme-customizer";
-import { Button } from "@/components/ui/button";
+import { BookOpen, FolderOpen, Settings2, Tag, Users } from "lucide-react"
+import Link from "next/link"
+import { useState } from "react"
+import { ThemeCustomizer } from "@/components/theme/theme-customizer"
+import { Button } from "@/components/ui/button"
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card";
+} from "@/components/ui/card"
 import {
 	Dialog,
 	DialogContent,
@@ -19,10 +19,10 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@/components/ui/dialog"
 
 export default function Home() {
-	const [isCustomizerOpen, setIsCustomizerOpen] = useState(false);
+	const [isCustomizerOpen, setIsCustomizerOpen] = useState(false)
 	return (
 		<div className="flex flex-col min-h-screen">
 			{/* Hero Section */}
@@ -162,5 +162,5 @@ export default function Home() {
 				</div>
 			</section>
 		</div>
-	);
+	)
 }

@@ -1,37 +1,37 @@
 /**
  * tRPC initialization and context setup
  */
-import { initTRPC, TRPCError } from "@trpc/server";
-import type { Session } from "next-auth";
-import superjson from "superjson";
-import { ZodError } from "zod";
-import { prisma } from "@/lib/prisma";
+import { initTRPC, TRPCError } from "@trpc/server"
+import type { Session } from "next-auth"
+import superjson from "superjson"
+import { ZodError } from "zod"
+import { prisma } from "@/lib/prisma"
 
 /**
  * 1. CONTEXT
  * This is the context that is passed to all tRPC procedures
  */
 export interface CreateContextOptions {
-	session: Session | null;
+	session: Session | null
 }
 
 export const createInnerTRPCContext = (opts: CreateContextOptions) => {
 	return {
 		session: opts.session,
 		prisma,
-	};
-};
+	}
+}
 
 export const createTRPCContext = async (opts: {
-	headers: Headers;
-	session: Session | null;
+	headers: Headers
+	session: Session | null
 }) => {
 	return createInnerTRPCContext({
 		session: opts.session,
-	});
-};
+	})
+}
 
-export type Context = Awaited<ReturnType<typeof createTRPCContext>>;
+export type Context = Awaited<ReturnType<typeof createTRPCContext>>
 
 /**
  * 2. INITIALIZATION
@@ -47,27 +47,27 @@ const t = initTRPC.context<Context>().create({
 				zodError:
 					error.cause instanceof ZodError ? error.cause.flatten() : null,
 			},
-		};
+		}
 	},
-});
+})
 
 /**
  * 3. ROUTER & PROCEDURE HELPERS
  */
-export const createTRPCRouter = t.router;
-export const publicProcedure = t.procedure;
+export const createTRPCRouter = t.router
+export const publicProcedure = t.procedure
 
 /**
  * Protected procedure for authenticated users
  */
 export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
 	if (!ctx.session || !ctx.session.user) {
-		throw new TRPCError({ code: "UNAUTHORIZED" });
+		throw new TRPCError({ code: "UNAUTHORIZED" })
 	}
 	return next({
 		ctx: {
 			// infers the `session` as non-nullable
 			session: { ...ctx.session, user: ctx.session.user },
 		},
-	});
-});
+	})
+})

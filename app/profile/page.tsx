@@ -1,38 +1,38 @@
-"use client";
+"use client"
 
-import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { useEffect } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Loader2 } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
+import { useEffect } from "react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card";
+} from "@/components/ui/card"
 
 export default function ProfilePage() {
-	const { data: session, status } = useSession();
-	const router = useRouter();
+	const { data: session, status } = useSession()
+	const router = useRouter()
 
 	useEffect(() => {
 		if (status === "unauthenticated") {
-			router.push("/login");
+			router.push("/login")
 		}
-	}, [status, router]);
+	}, [status, router])
 
 	if (status === "loading") {
 		return (
 			<div className="container flex items-center justify-center min-h-[calc(100vh-200px)]">
 				<Loader2 className="h-8 w-8 animate-spin text-primary" />
 			</div>
-		);
+		)
 	}
 
 	if (!session) {
-		return null;
+		return null
 	}
 
 	return (
@@ -71,5 +71,5 @@ export default function ProfilePage() {
 				</Card>
 			</div>
 		</div>
-	);
+	)
 }

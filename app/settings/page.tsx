@@ -1,53 +1,53 @@
-"use client";
+"use client"
 
-import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
-import { ThemeCustomizer } from "@/components/theme/theme-customizer";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
-import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
+import { useTheme } from "next-themes"
+import { useEffect, useState } from "react"
+import { ThemeCustomizer } from "@/components/theme/theme-customizer"
+import { ThemeToggle } from "@/components/theme/theme-toggle"
+import { Button } from "@/components/ui/button"
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useThemeSettings } from "@/lib/hooks/use-theme-settings";
-import { trpc } from "@/lib/trpc/client";
+} from "@/components/ui/card"
+import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useThemeSettings } from "@/lib/hooks/use-theme-settings"
+import { trpc } from "@/lib/trpc/client"
 
 export default function SettingsPage() {
-	const { data: session, status } = useSession();
-	const router = useRouter();
-	const { theme } = useTheme();
-	const { componentTheme } = useThemeSettings();
-	const [showNSFW, setShowNSFW] = useState(false);
-	const [isSaving, setIsSaving] = useState(false);
+	const { data: session, status } = useSession()
+	const router = useRouter()
+	const { theme } = useTheme()
+	const { componentTheme } = useThemeSettings()
+	const [showNSFW, setShowNSFW] = useState(false)
+	const [isSaving, setIsSaving] = useState(false)
 
-	const updateSettingsMutation = trpc.user.updateSettings.useMutation();
+	const updateSettingsMutation = trpc.user.updateSettings.useMutation()
 
 	useEffect(() => {
 		if (status === "unauthenticated") {
-			router.push("/login");
+			router.push("/login")
 		}
-	}, [status, router]);
+	}, [status, router])
 
 	useEffect(() => {
 		// Load settings from localStorage or session
-		const settings = localStorage.getItem("userSettings");
+		const settings = localStorage.getItem("userSettings")
 		if (settings) {
-			const parsed = JSON.parse(settings);
-			setShowNSFW(parsed.showNSFW ?? false);
+			const parsed = JSON.parse(settings)
+			setShowNSFW(parsed.showNSFW ?? false)
 		}
-	}, []);
+	}, [])
 
 	const handleSaveSettings = async () => {
-		setIsSaving(true);
+		setIsSaving(true)
 		try {
 			// Save to localStorage
 			localStorage.setItem(
@@ -55,7 +55,7 @@ export default function SettingsPage() {
 				JSON.stringify({
 					showNSFW,
 				}),
-			);
+			)
 
 			// Save to database via tRPC
 			if (session) {
@@ -65,28 +65,28 @@ export default function SettingsPage() {
 						colorTheme: (theme as "light" | "dark" | "system") || "system",
 						componentTheme,
 					},
-				});
+				})
 			}
 
 			setTimeout(() => {
-				setIsSaving(false);
-			}, 500);
+				setIsSaving(false)
+			}, 500)
 		} catch (error) {
-			console.error("Error saving settings:", error);
-			setIsSaving(false);
+			console.error("Error saving settings:", error)
+			setIsSaving(false)
 		}
-	};
+	}
 
 	if (status === "loading") {
 		return (
 			<div className="container flex items-center justify-center min-h-[calc(100vh-200px)]">
 				<Loader2 className="h-8 w-8 animate-spin text-primary" />
 			</div>
-		);
+		)
 	}
 
 	if (!session) {
-		return null;
+		return null
 	}
 
 	return (
@@ -177,5 +177,5 @@ export default function SettingsPage() {
 				</div>
 			</div>
 		</div>
-	);
+	)
 }

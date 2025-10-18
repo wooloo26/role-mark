@@ -1,70 +1,70 @@
-"use client";
+"use client"
 
-import { useCallback, useEffect, useId, useState } from "react";
-import { CustomPaletteEditor } from "@/components/theme/custom-palette-editor";
-import { Button } from "@/components/ui/button";
+import { useCallback, useEffect, useId, useState } from "react"
+import { CustomPaletteEditor } from "@/components/theme/custom-palette-editor"
+import { Button } from "@/components/ui/button"
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+} from "@/components/ui/card"
+import { Label } from "@/components/ui/label"
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { useThemeSettings } from "@/lib/hooks/use-theme-settings";
-import { getAllPalettes, isCustomPalette } from "@/lib/theme-config";
+} from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
+import { useThemeSettings } from "@/lib/hooks/use-theme-settings"
+import { getAllPalettes, isCustomPalette } from "@/lib/theme-config"
 
 export function ThemeCustomizer() {
 	const { componentTheme, updateComponentTheme, resetToDefaults, isLoaded } =
-		useThemeSettings();
+		useThemeSettings()
 	const [availablePalettes, setAvailablePalettes] = useState<
 		Record<string, string>
-	>({});
+	>({})
 
-	const radiusId = useId();
-	const fontSizeId = useId();
-	const cardStyleId = useId();
-	const colorPaletteId = useId();
-	const reducedMotionId = useId();
+	const radiusId = useId()
+	const fontSizeId = useId()
+	const cardStyleId = useId()
+	const colorPaletteId = useId()
+	const reducedMotionId = useId()
 
 	const loadPalettes = useCallback(() => {
-		const allPalettes = getAllPalettes();
-		const paletteLabels: Record<string, string> = {};
+		const allPalettes = getAllPalettes()
+		const paletteLabels: Record<string, string> = {}
 
 		// Built-in palettes with nice labels
-		paletteLabels.default = "Default (Neutral)";
+		paletteLabels.default = "Default (Neutral)"
 
 		// Add custom palettes
 		Object.keys(allPalettes).forEach((name) => {
 			if (isCustomPalette(name)) {
-				paletteLabels[name] = `${name} (Custom)`;
+				paletteLabels[name] = `${name} (Custom)`
 			}
-		});
+		})
 
-		setAvailablePalettes(paletteLabels);
-	}, []);
+		setAvailablePalettes(paletteLabels)
+	}, [])
 
 	// Load available palettes
 	useEffect(() => {
-		loadPalettes();
-	}, [loadPalettes]);
+		loadPalettes()
+	}, [loadPalettes])
 
 	const handlePaletteCreated = (paletteName: string) => {
-		loadPalettes();
+		loadPalettes()
 		// Automatically switch to the newly created palette
-		updateComponentTheme({ colorPalette: paletteName });
-	};
+		updateComponentTheme({ colorPalette: paletteName })
+	}
 
 	if (!isLoaded) {
-		return <div className="text-sm text-muted-foreground">Loading...</div>;
+		return <div className="text-sm text-muted-foreground">Loading...</div>
 	}
 
 	return (
@@ -308,5 +308,5 @@ export function ThemeCustomizer() {
 				</Button>
 			</div>
 		</div>
-	);
+	)
 }

@@ -1,29 +1,29 @@
-"use client";
+"use client"
 
-import { Loader2, Plus, Search } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Loader2, Plus, Search } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
+import { useState } from "react"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { trpc } from "@/lib/trpc/client";
+} from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { trpc } from "@/lib/trpc/client"
 
 export default function CharactersPage() {
-	const [searchQuery, setSearchQuery] = useState("");
+	const [searchQuery, setSearchQuery] = useState("")
 	const { data, isLoading } = trpc.character.search.useQuery({
 		name: searchQuery,
 		limit: 50,
-	});
+	})
 
-	const characters = data?.characters ?? [];
+	const characters = data?.characters ?? []
 
 	return (
 		<div className="container py-8">
@@ -139,5 +139,5 @@ export default function CharactersPage() {
 				)}
 			</div>
 		</div>
-	);
+	)
 }

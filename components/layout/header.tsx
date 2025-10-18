@@ -1,12 +1,12 @@
-"use client";
+"use client"
 
-import { LogIn, LogOut, Settings, User } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { signOut, useSession } from "next-auth/react";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { LogIn, LogOut, Settings, User } from "lucide-react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { signOut, useSession } from "next-auth/react"
+import { ThemeToggle } from "@/components/theme/theme-toggle"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -14,17 +14,17 @@ import {
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu"
 
 const navigation = [
 	{ name: "Characters", href: "/characters" },
 	{ name: "Resources", href: "/resources" },
 	{ name: "Wiki", href: "/wiki" },
-];
+]
 
 export function Header() {
-	const pathname = usePathname();
-	const { data: session } = useSession();
+	const pathname = usePathname()
+	const { data: session } = useSession()
 
 	return (
 		<header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -114,5 +114,5 @@ export function Header() {
 				</div>
 			</div>
 		</header>
-	);
+	)
 }

@@ -1,19 +1,19 @@
-"use client";
+"use client"
 
-import type { ThemeProviderProps } from "next-themes";
-import { ThemeProvider as NextThemesProvider } from "next-themes";
-import { useEffect } from "react";
+import type { ThemeProviderProps } from "next-themes"
+import { ThemeProvider as NextThemesProvider } from "next-themes"
+import { useEffect } from "react"
 import {
 	applyColorPalette,
 	applyComponentTheme,
 	getStoredThemeSettings,
-} from "@/lib/theme-config";
+} from "@/lib/theme-config"
 
 function ThemeInitializer() {
 	useEffect(() => {
 		// Apply component theme on mount (in case the script didn't run)
-		const settings = getStoredThemeSettings();
-		applyComponentTheme(settings.componentTheme);
+		const settings = getStoredThemeSettings()
+		applyComponentTheme(settings.componentTheme)
 
 		// Listen for theme changes (light/dark mode toggle)
 		const observer = new MutationObserver((mutations) => {
@@ -23,21 +23,21 @@ function ThemeInitializer() {
 					mutation.attributeName === "class"
 				) {
 					// Reapply color palette when theme changes
-					const currentSettings = getStoredThemeSettings();
-					applyColorPalette(currentSettings.componentTheme.colorPalette);
+					const currentSettings = getStoredThemeSettings()
+					applyColorPalette(currentSettings.componentTheme.colorPalette)
 				}
-			});
-		});
+			})
+		})
 
 		observer.observe(document.documentElement, {
 			attributes: true,
 			attributeFilter: ["class"],
-		});
+		})
 
-		return () => observer.disconnect();
-	}, []);
+		return () => observer.disconnect()
+	}, [])
 
-	return null;
+	return null
 }
 
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
@@ -46,7 +46,7 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
 			<ThemeInitializer />
 			{children}
 		</NextThemesProvider>
-	);
+	)
 }
 
 /**
@@ -178,12 +178,12 @@ export function ThemeScript() {
 				// Silently fail - will use default theme
 			}
 		})();
-	`;
+	`
 
 	return (
 		<script
 			dangerouslySetInnerHTML={{ __html: themeScript }}
 			suppressHydrationWarning
 		/>
-	);
+	)
 }

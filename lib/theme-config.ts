@@ -3,22 +3,22 @@
  * Supports color themes (light/dark/custom) and component-level customization
  */
 
-export type ColorTheme = "light" | "dark" | "system";
+export type ColorTheme = "light" | "dark" | "system"
 
 // Available color palettes (each has light and dark variants)
-export type ColorPalette = "default" | string; // Allow custom palette names
+export type ColorPalette = "default" | string // Allow custom palette names
 
 export interface ComponentTheme {
 	// Border radius settings
-	radius: "none" | "sm" | "md" | "lg" | "xl";
+	radius: "none" | "sm" | "md" | "lg" | "xl"
 	// Font size scale
-	fontSize: "xs" | "sm" | "base" | "lg" | "xl";
+	fontSize: "xs" | "sm" | "base" | "lg" | "xl"
 	// Card styling
-	cardStyle: "flat" | "bordered" | "elevated";
+	cardStyle: "flat" | "bordered" | "elevated"
 	// Animation preferences
-	reducedMotion: boolean;
+	reducedMotion: boolean
 	// Color palette
-	colorPalette: ColorPalette;
+	colorPalette: ColorPalette
 }
 
 export const defaultComponentTheme: ComponentTheme = {
@@ -27,48 +27,48 @@ export const defaultComponentTheme: ComponentTheme = {
 	cardStyle: "elevated",
 	reducedMotion: false,
 	colorPalette: "default",
-};
+}
 
 // Color palette definitions
 export interface PaletteColors {
 	light: {
-		background: string;
-		foreground: string;
-		card: string;
-		cardForeground: string;
-		popover: string;
-		popoverForeground: string;
-		primary: string;
-		primaryForeground: string;
-		secondary: string;
-		secondaryForeground: string;
-		muted: string;
-		mutedForeground: string;
-		accent: string;
-		accentForeground: string;
-		border: string;
-		input: string;
-		ring: string;
-	};
+		background: string
+		foreground: string
+		card: string
+		cardForeground: string
+		popover: string
+		popoverForeground: string
+		primary: string
+		primaryForeground: string
+		secondary: string
+		secondaryForeground: string
+		muted: string
+		mutedForeground: string
+		accent: string
+		accentForeground: string
+		border: string
+		input: string
+		ring: string
+	}
 	dark: {
-		background: string;
-		foreground: string;
-		card: string;
-		cardForeground: string;
-		popover: string;
-		popoverForeground: string;
-		primary: string;
-		primaryForeground: string;
-		secondary: string;
-		secondaryForeground: string;
-		muted: string;
-		mutedForeground: string;
-		accent: string;
-		accentForeground: string;
-		border: string;
-		input: string;
-		ring: string;
-	};
+		background: string
+		foreground: string
+		card: string
+		cardForeground: string
+		popover: string
+		popoverForeground: string
+		primary: string
+		primaryForeground: string
+		secondary: string
+		secondaryForeground: string
+		muted: string
+		mutedForeground: string
+		accent: string
+		accentForeground: string
+		border: string
+		input: string
+		ring: string
+	}
 }
 
 export const colorPalettes: Record<ColorPalette, PaletteColors> = {
@@ -112,17 +112,17 @@ export const colorPalettes: Record<ColorPalette, PaletteColors> = {
 			ring: "oklch(0.68 0.154 221.72)",
 		},
 	},
-};
+}
 
 export interface ThemeSettings {
-	colorTheme: ColorTheme;
-	componentTheme: ComponentTheme;
+	colorTheme: ColorTheme
+	componentTheme: ComponentTheme
 }
 
 export const defaultThemeSettings: ThemeSettings = {
 	colorTheme: "system",
 	componentTheme: defaultComponentTheme,
-};
+}
 
 // Radius value mappings
 export const radiusValues: Record<ComponentTheme["radius"], string> = {
@@ -131,7 +131,7 @@ export const radiusValues: Record<ComponentTheme["radius"], string> = {
 	md: "0.625rem",
 	lg: "1rem",
 	xl: "1.5rem",
-};
+}
 
 // Font size scale mappings
 export const fontSizeValues: Record<
@@ -143,45 +143,45 @@ export const fontSizeValues: Record<
 	base: { base: "16px", scale: 1 },
 	lg: { base: "17px", scale: 1.05 },
 	xl: { base: "18px", scale: 1.1 },
-};
+}
 
 /**
  * Get theme settings from localStorage
  */
 export function getStoredThemeSettings(): ThemeSettings {
 	if (typeof window === "undefined") {
-		return defaultThemeSettings;
+		return defaultThemeSettings
 	}
 
 	try {
-		const stored = localStorage.getItem("themeSettings");
+		const stored = localStorage.getItem("themeSettings")
 		if (stored) {
-			const parsed = JSON.parse(stored);
+			const parsed = JSON.parse(stored)
 			return {
 				colorTheme: parsed.colorTheme || defaultThemeSettings.colorTheme,
 				componentTheme: {
 					...defaultComponentTheme,
 					...parsed.componentTheme,
 				},
-			};
+			}
 		}
 	} catch (error) {
-		console.error("Error loading theme settings:", error);
+		console.error("Error loading theme settings:", error)
 	}
 
-	return defaultThemeSettings;
+	return defaultThemeSettings
 }
 
 /**
  * Save theme settings to localStorage
  */
 export function saveThemeSettings(settings: ThemeSettings): void {
-	if (typeof window === "undefined") return;
+	if (typeof window === "undefined") return
 
 	try {
-		localStorage.setItem("themeSettings", JSON.stringify(settings));
+		localStorage.setItem("themeSettings", JSON.stringify(settings))
 	} catch (error) {
-		console.error("Error saving theme settings:", error);
+		console.error("Error saving theme settings:", error)
 	}
 }
 
@@ -189,76 +189,76 @@ export function saveThemeSettings(settings: ThemeSettings): void {
  * Apply component theme to document root
  */
 export function applyComponentTheme(theme: ComponentTheme): void {
-	if (typeof document === "undefined") return;
+	if (typeof document === "undefined") return
 
-	const root = document.documentElement;
+	const root = document.documentElement
 
 	// Apply radius
-	root.style.setProperty("--radius", radiusValues[theme.radius]);
+	root.style.setProperty("--radius", radiusValues[theme.radius])
 
 	// Apply font size
-	const fontSize = fontSizeValues[theme.fontSize];
-	root.style.fontSize = fontSize.base;
-	root.style.setProperty("--font-scale", fontSize.scale.toString());
+	const fontSize = fontSizeValues[theme.fontSize]
+	root.style.fontSize = fontSize.base
+	root.style.setProperty("--font-scale", fontSize.scale.toString())
 
 	// Apply card style class
-	root.setAttribute("data-card-style", theme.cardStyle);
+	root.setAttribute("data-card-style", theme.cardStyle)
 
 	// Apply reduced motion preference
 	if (theme.reducedMotion) {
-		root.style.setProperty("--animation-duration", "0.01ms");
+		root.style.setProperty("--animation-duration", "0.01ms")
 	} else {
-		root.style.removeProperty("--animation-duration");
+		root.style.removeProperty("--animation-duration")
 	}
 
 	// Apply color palette
-	applyColorPalette(theme.colorPalette);
+	applyColorPalette(theme.colorPalette)
 }
 
 /**
  * Apply color palette to document root
  */
 export function applyColorPalette(palette: ColorPalette): void {
-	if (typeof document === "undefined") return;
+	if (typeof document === "undefined") return
 
-	const root = document.documentElement;
-	const allPalettes = getAllPalettes();
-	const colors = allPalettes[palette] || colorPalettes.default;
+	const root = document.documentElement
+	const allPalettes = getAllPalettes()
+	const colors = allPalettes[palette] || colorPalettes.default
 
 	// Determine if dark mode is active
-	const isDark = root.classList.contains("dark");
-	const paletteColors = isDark ? colors.dark : colors.light;
+	const isDark = root.classList.contains("dark")
+	const paletteColors = isDark ? colors.dark : colors.light
 
 	// Apply each color variable
-	root.style.setProperty("--background", paletteColors.background);
-	root.style.setProperty("--foreground", paletteColors.foreground);
-	root.style.setProperty("--card", paletteColors.card);
-	root.style.setProperty("--card-foreground", paletteColors.cardForeground);
-	root.style.setProperty("--popover", paletteColors.popover);
+	root.style.setProperty("--background", paletteColors.background)
+	root.style.setProperty("--foreground", paletteColors.foreground)
+	root.style.setProperty("--card", paletteColors.card)
+	root.style.setProperty("--card-foreground", paletteColors.cardForeground)
+	root.style.setProperty("--popover", paletteColors.popover)
 	root.style.setProperty(
 		"--popover-foreground",
 		paletteColors.popoverForeground,
-	);
-	root.style.setProperty("--primary", paletteColors.primary);
+	)
+	root.style.setProperty("--primary", paletteColors.primary)
 	root.style.setProperty(
 		"--primary-foreground",
 		paletteColors.primaryForeground,
-	);
-	root.style.setProperty("--secondary", paletteColors.secondary);
+	)
+	root.style.setProperty("--secondary", paletteColors.secondary)
 	root.style.setProperty(
 		"--secondary-foreground",
 		paletteColors.secondaryForeground,
-	);
-	root.style.setProperty("--muted", paletteColors.muted);
-	root.style.setProperty("--muted-foreground", paletteColors.mutedForeground);
-	root.style.setProperty("--accent", paletteColors.accent);
-	root.style.setProperty("--accent-foreground", paletteColors.accentForeground);
-	root.style.setProperty("--border", paletteColors.border);
-	root.style.setProperty("--input", paletteColors.input);
-	root.style.setProperty("--ring", paletteColors.ring);
+	)
+	root.style.setProperty("--muted", paletteColors.muted)
+	root.style.setProperty("--muted-foreground", paletteColors.mutedForeground)
+	root.style.setProperty("--accent", paletteColors.accent)
+	root.style.setProperty("--accent-foreground", paletteColors.accentForeground)
+	root.style.setProperty("--border", paletteColors.border)
+	root.style.setProperty("--input", paletteColors.input)
+	root.style.setProperty("--ring", paletteColors.ring)
 
 	// Store the current palette for theme switching
-	root.setAttribute("data-color-palette", palette);
+	root.setAttribute("data-color-palette", palette)
 }
 
 /**
@@ -266,19 +266,19 @@ export function applyColorPalette(palette: ColorPalette): void {
  */
 export function getCustomPalettes(): Record<string, PaletteColors> {
 	if (typeof window === "undefined") {
-		return {};
+		return {}
 	}
 
 	try {
-		const stored = localStorage.getItem("customPalettes");
+		const stored = localStorage.getItem("customPalettes")
 		if (stored) {
-			return JSON.parse(stored);
+			return JSON.parse(stored)
 		}
 	} catch (error) {
-		console.error("Error loading custom palettes:", error);
+		console.error("Error loading custom palettes:", error)
 	}
 
-	return {};
+	return {}
 }
 
 /**
@@ -287,12 +287,12 @@ export function getCustomPalettes(): Record<string, PaletteColors> {
 export function saveCustomPalettes(
 	palettes: Record<string, PaletteColors>,
 ): void {
-	if (typeof window === "undefined") return;
+	if (typeof window === "undefined") return
 
 	try {
-		localStorage.setItem("customPalettes", JSON.stringify(palettes));
+		localStorage.setItem("customPalettes", JSON.stringify(palettes))
 	} catch (error) {
-		console.error("Error saving custom palettes:", error);
+		console.error("Error saving custom palettes:", error)
 	}
 }
 
@@ -300,18 +300,18 @@ export function saveCustomPalettes(
  * Add a custom color palette
  */
 export function addCustomPalette(name: string, colors: PaletteColors): void {
-	const customPalettes = getCustomPalettes();
-	customPalettes[name] = colors;
-	saveCustomPalettes(customPalettes);
+	const customPalettes = getCustomPalettes()
+	customPalettes[name] = colors
+	saveCustomPalettes(customPalettes)
 }
 
 /**
  * Delete a custom color palette
  */
 export function deleteCustomPalette(name: string): void {
-	const customPalettes = getCustomPalettes();
-	delete customPalettes[name];
-	saveCustomPalettes(customPalettes);
+	const customPalettes = getCustomPalettes()
+	delete customPalettes[name]
+	saveCustomPalettes(customPalettes)
 }
 
 /**
@@ -321,12 +321,12 @@ export function getAllPalettes(): Record<string, PaletteColors> {
 	return {
 		...colorPalettes,
 		...getCustomPalettes(),
-	};
+	}
 }
 
 /**
  * Check if a palette is custom (not built-in)
  */
 export function isCustomPalette(paletteName: string): boolean {
-	return !(paletteName in colorPalettes);
+	return !(paletteName in colorPalettes)
 }

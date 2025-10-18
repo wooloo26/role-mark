@@ -1,26 +1,26 @@
-"use client";
+"use client"
 
-import { BookOpen, Loader2, Plus, Search } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { BookOpen, Loader2, Plus, Search } from "lucide-react"
+import Link from "next/link"
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
 import {
 	Card,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { trpc } from "@/lib/trpc/client";
+} from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { trpc } from "@/lib/trpc/client"
 
 export default function WikiPage() {
-	const [searchQuery, setSearchQuery] = useState("");
+	const [searchQuery, setSearchQuery] = useState("")
 	const { data, isLoading } = trpc.wiki.search.useQuery({
 		title: searchQuery,
 		limit: 50,
-	});
+	})
 
-	const wikiPages = data?.wikiPages ?? [];
+	const wikiPages = data?.wikiPages ?? []
 
 	return (
 		<div className="container py-8">
@@ -103,5 +103,5 @@ export default function WikiPage() {
 				)}
 			</div>
 		</div>
-	);
+	)
 }

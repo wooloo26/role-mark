@@ -1,42 +1,42 @@
-import { ArrowLeft, Edit } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { ArrowLeft, Edit } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
+import { notFound } from "next/navigation"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { prisma } from "@/lib/prisma";
-import { createCaller } from "@/server/routers/_app";
+} from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { prisma } from "@/lib/prisma"
+import { createCaller } from "@/server/routers/_app"
 
 type Props = {
-	params: Promise<{ id: string }>;
-};
+	params: Promise<{ id: string }>
+}
 
 export default async function CharacterDetailPage({ params }: Props) {
-	const { id } = await params;
+	const { id } = await params
 
 	// Create server-side tRPC caller
-	const caller = createCaller({ prisma, session: null });
+	const caller = createCaller({ prisma, session: null })
 
 	try {
-		const character = await caller.character.getById({ id });
+		const character = await caller.character.getById({ id })
 
 		if (!character) {
-			notFound();
+			notFound()
 		}
 
 		// Parse static tags if they exist
 		const staticTags = character.staticTags
 			? (character.staticTags as Record<string, unknown>)
-			: null;
+			: null
 
 		return (
 			<div className="container py-8">
@@ -198,9 +198,9 @@ export default async function CharacterDetailPage({ params }: Props) {
 					</div>
 				</div>
 			</div>
-		);
+		)
 	} catch (error) {
-		console.error("Error fetching character:", error);
-		notFound();
+		console.error("Error fetching character:", error)
+		notFound()
 	}
 }

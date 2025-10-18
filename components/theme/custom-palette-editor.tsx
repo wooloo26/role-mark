@@ -1,15 +1,15 @@
-"use client";
+"use client"
 
-import { Plus, Trash2 } from "lucide-react";
-import { useId, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Plus, Trash2 } from "lucide-react"
+import { useId, useState } from "react"
+import { Button } from "@/components/ui/button"
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card";
+} from "@/components/ui/card"
 import {
 	Dialog,
 	DialogContent,
@@ -18,19 +18,19 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
 	addCustomPalette,
 	deleteCustomPalette,
 	getCustomPalettes,
 	type PaletteColors,
-} from "@/lib/theme-config";
+} from "@/lib/theme-config"
 
 interface CustomPaletteEditorProps {
-	onPaletteCreated?: (name: string) => void;
+	onPaletteCreated?: (name: string) => void
 }
 
 const defaultLightColors = {
@@ -51,7 +51,7 @@ const defaultLightColors = {
 	border: "oklch(0.9 0.008 240)",
 	input: "oklch(0.9 0.008 240)",
 	ring: "oklch(0.68 0.154 221.72)",
-};
+}
 
 const defaultDarkColors = {
 	background: "oklch(0.15 0.01 240)",
@@ -71,68 +71,68 @@ const defaultDarkColors = {
 	border: "oklch(0.3 0.02 240)",
 	input: "oklch(0.3 0.02 240)",
 	ring: "oklch(0.68 0.154 221.72)",
-};
+}
 
 export function CustomPaletteEditor({
 	onPaletteCreated,
 }: CustomPaletteEditorProps) {
-	const paletteNameId = useId();
-	const [isOpen, setIsOpen] = useState(false);
-	const [paletteName, setPaletteName] = useState("");
-	const [lightColors, setLightColors] = useState(defaultLightColors);
-	const [darkColors, setDarkColors] = useState(defaultDarkColors);
+	const paletteNameId = useId()
+	const [isOpen, setIsOpen] = useState(false)
+	const [paletteName, setPaletteName] = useState("")
+	const [lightColors, setLightColors] = useState(defaultLightColors)
+	const [darkColors, setDarkColors] = useState(defaultDarkColors)
 	const [customPalettes, setCustomPalettes] = useState<
 		Record<string, PaletteColors>
-	>({});
+	>({})
 
 	const loadCustomPalettes = () => {
-		setCustomPalettes(getCustomPalettes());
-	};
+		setCustomPalettes(getCustomPalettes())
+	}
 
 	const handleOpen = (open: boolean) => {
-		setIsOpen(open);
+		setIsOpen(open)
 		if (open) {
-			loadCustomPalettes();
+			loadCustomPalettes()
 			// Reset form
-			setPaletteName("");
-			setLightColors(defaultLightColors);
-			setDarkColors(defaultDarkColors);
+			setPaletteName("")
+			setLightColors(defaultLightColors)
+			setDarkColors(defaultDarkColors)
 		}
-	};
+	}
 
 	const handleSave = () => {
 		if (!paletteName.trim()) {
-			alert("Please enter a palette name");
-			return;
+			alert("Please enter a palette name")
+			return
 		}
 
 		// Validate palette name (alphanumeric and hyphens only)
-		const validName = paletteName.toLowerCase().replace(/[^a-z0-9-]/g, "-");
+		const validName = paletteName.toLowerCase().replace(/[^a-z0-9-]/g, "-")
 
 		const newPalette: PaletteColors = {
 			light: lightColors,
 			dark: darkColors,
-		};
+		}
 
-		addCustomPalette(validName, newPalette);
-		setIsOpen(false);
-		onPaletteCreated?.(validName);
-	};
+		addCustomPalette(validName, newPalette)
+		setIsOpen(false)
+		onPaletteCreated?.(validName)
+	}
 
 	const handleDelete = (name: string) => {
 		if (confirm(`Are you sure you want to delete the "${name}" palette?`)) {
-			deleteCustomPalette(name);
-			loadCustomPalettes();
+			deleteCustomPalette(name)
+			loadCustomPalettes()
 		}
-	};
+	}
 
 	const updateLightColor = (key: keyof typeof lightColors, value: string) => {
-		setLightColors((prev) => ({ ...prev, [key]: value }));
-	};
+		setLightColors((prev) => ({ ...prev, [key]: value }))
+	}
 
 	const updateDarkColor = (key: keyof typeof darkColors, value: string) => {
-		setDarkColors((prev) => ({ ...prev, [key]: value }));
-	};
+		setDarkColors((prev) => ({ ...prev, [key]: value }))
+	}
 
 	return (
 		<Dialog open={isOpen} onOpenChange={handleOpen}>
@@ -274,5 +274,5 @@ export function CustomPaletteEditor({
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
-	);
+	)
 }
