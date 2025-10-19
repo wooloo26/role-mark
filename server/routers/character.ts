@@ -44,7 +44,7 @@ const characterSearchSchema = z.object({
 const createRelationSchema = z.object({
 	fromCharacterId: z.string(),
 	toCharacterId: z.string(),
-	relationType: z.string().min(1).max(100),
+	relationTypeId: z.string(),
 	isBidirectional: z.boolean().default(false),
 })
 
@@ -99,6 +99,7 @@ export const characterRouter = createTRPCRouter({
 									avatarUrl: true,
 								},
 							},
+							relationType: true,
 						},
 					},
 					relationsTo: {
@@ -110,6 +111,7 @@ export const characterRouter = createTRPCRouter({
 									avatarUrl: true,
 								},
 							},
+							relationType: true,
 						},
 					},
 				},
@@ -305,7 +307,7 @@ export const characterRouter = createTRPCRouter({
 				data: {
 					fromCharacterId: input.fromCharacterId,
 					toCharacterId: input.toCharacterId,
-					relationType: input.relationType,
+					relationTypeId: input.relationTypeId,
 					isBidirectional: input.isBidirectional,
 				},
 			})

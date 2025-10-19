@@ -20,19 +20,19 @@ model User {
   email         String    @unique
   emailVerified DateTime?
   image         String?
-  password      String?   // For credentials authentication
-  settings      Json?     // Theme preferences, NSFW toggle, etc.
+  password      String? // For credentials authentication
+  settings      Json? // Theme preferences, NSFW toggle, etc.
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
   // NextAuth.js relations
-  accounts      Account[]
-  sessions      Session[]
+  accounts Account[]
+  sessions Session[]
 
   // User content relations
-  comments      Comment[]
-  resources     Resource[] @relation("ResourceUploader")
-  wikiPages     WikiPage[] @relation("WikiPageAuthor")
+  comments  Comment[]
+  resources Resource[] @relation("ResourceUploader")
+  wikiPages WikiPage[] @relation("WikiPageAuthor")
 
   @@map("users")
 }
@@ -78,13 +78,13 @@ model VerificationToken {
 }
 
 model Comment {
-  id         String   @id @default(cuid())
-  content    String   @db.Text
-  authorId   String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id        String   @id @default(cuid())
+  content   String   @db.Text
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  author     User                  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author     User                 @relation(fields: [authorId], references: [id], onDelete: Cascade)
   characters CharacterOnComment[]
 
   @@index([authorId])
@@ -97,57 +97,72 @@ model Comment {
 // ============================================
 
 model Character {
-  id          String   @id @default(cuid())
+  id          String         @id @default(cuid())
   name        String
   avatarUrl   String?
   portraitUrl String?
-  info        String?  @db.Text // Summary text (Markdown-supported)
-  staticTags  Json?    // Structured fields: { height: number, weight: number, birthday: Date }
+  info        String?        @db.Text // Summary text (Markdown-supported)
+  staticTags  Json? // Structured fields: { height: number, weight: number, birthday: Date }
   // dynamic tags are stored in the dedicated Tag model and associated via CharacterTag
   tags        CharacterTag[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
 
   // Many-to-many relations
-  resources        CharacterOnResource[]
-  wikiPages        CharacterOnWikiPage[]
-  comments         CharacterOnComment[]
+  resources CharacterOnResource[]
+  wikiPages CharacterOnWikiPage[]
+  comments  CharacterOnComment[]
 
   // Self-referencing relationship
-  relationsFrom    CharacterRelation[]   @relation("CharacterFrom")
-  relationsTo      CharacterRelation[]   @relation("CharacterTo")
+  relationsFrom CharacterRelation[] @relation("CharacterFrom")
+  relationsTo   CharacterRelation[] @relation("CharacterTo")
 
   @@index([name])
   @@map("characters")
+}
+
+model RelationType {
+  id          String   @id @default(cuid())
+  name        String   @unique // e.g., "siblings", "rivals", "friends"
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  relations CharacterRelation[]
+
+  @@index([name])
+  @@map("relation_types")
 }
 
 model CharacterRelation {
   id              String   @id @default(cuid())
   fromCharacterId String
   toCharacterId   String
-  relationType    String   // e.g., "siblings", "rivals", "friends"
+  relationTypeId  String
   isBidirectional Boolean  @default(false)
   createdAt       DateTime @default(now())
 
-  fromCharacter Character @relation("CharacterFrom", fields: [fromCharacterId], references: [id], onDelete: Cascade)
-  toCharacter   Character @relation("CharacterTo", fields: [toCharacterId], references: [id], onDelete: Cascade)
+  fromCharacter Character    @relation("CharacterFrom", fields: [fromCharacterId], references: [id], onDelete: Cascade)
+  toCharacter   Character    @relation("CharacterTo", fields: [toCharacterId], references: [id], onDelete: Cascade)
+  relationType  RelationType @relation(fields: [relationTypeId], references: [id], onDelete: Cascade)
 
-  @@unique([fromCharacterId, toCharacterId, relationType])
+  @@unique([fromCharacterId, toCharacterId, relationTypeId])
   @@index([fromCharacterId])
   @@index([toCharacterId])
+  @@index([relationTypeId])
   @@map("character_relations")
 }
 
 model Resource {
-  id          String   @id @default(cuid())
-  title       String
-  fileUrl     String
-  mimeType    String
-  uploaderId  String?
+  id         String        @id @default(cuid())
+  title      String
+  fileUrl    String
+  mimeType   String
+  uploaderId String?
   // dynamic tags are stored in the dedicated Tag model and associated via ResourceTag
-  tags        ResourceTag[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  tags       ResourceTag[]
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
 
   uploader   User?                 @relation("ResourceUploader", fields: [uploaderId], references: [id], onDelete: SetNull)
   characters CharacterOnResource[]
@@ -159,13 +174,13 @@ model Resource {
 }
 
 model WikiPage {
-  id                   String   @id @default(cuid())
-  title                String
-  content              String   @db.Text // Markdown content
-  authorId             String?
-  aiSuggestionEnabled  Boolean  @default(false)
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  id                  String   @id @default(cuid())
+  title               String
+  content             String   @db.Text // Markdown content
+  authorId            String?
+  aiSuggestionEnabled Boolean  @default(false)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   author     User?                 @relation("WikiPageAuthor", fields: [authorId], references: [id], onDelete: SetNull)
   characters CharacterOnWikiPage[]
@@ -214,16 +229,16 @@ model TagGroup {
 }
 
 model Tag {
-  id            String   @id @default(cuid())
+  id            String         @id @default(cuid())
   name          String
-  slug          String   @unique
+  slug          String         @unique
   groupId       String?
   scope         TagScope
-  group         TagGroup?       @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  group         TagGroup?      @relation(fields: [groupId], references: [id], onDelete: SetNull)
   characterTags CharacterTag[]
   resourceTags  ResourceTag[]
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 
   @@index([name])
   @@index([scope])

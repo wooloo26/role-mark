@@ -18,7 +18,7 @@ const createTagSchema = z.object({
 			/^[a-z0-9-]+$/,
 			"Slug must contain only lowercase letters, numbers, and hyphens",
 		),
-	scope: z.nativeEnum(TagScope),
+	scope: z.enum(TagScope),
 	groupId: z.string().optional(),
 })
 
@@ -39,7 +39,7 @@ const updateTagSchema = z.object({
 
 const tagSearchSchema = z.object({
 	name: z.string().optional(),
-	scope: z.nativeEnum(TagScope).optional(),
+	scope: z.enum(TagScope).optional(),
 	groupId: z.string().optional(),
 	limit: z.number().min(1).max(100).default(50),
 	offset: z.number().min(0).default(0),
@@ -48,7 +48,7 @@ const tagSearchSchema = z.object({
 // TagGroup schemas
 const createTagGroupSchema = z.object({
 	name: z.string().min(1).max(100),
-	scope: z.nativeEnum(TagScope),
+	scope: z.enum(TagScope),
 })
 
 const updateTagGroupSchema = z.object({

@@ -170,12 +170,22 @@ async function main() {
 
 	console.log("✅ Created sample characters:", character1.name, character2.name)
 
+	// Create relation types
+	const friendsRelationType = await prisma.relationType.create({
+		data: {
+			name: "friends",
+			description: "Characters who are friends with each other",
+		},
+	})
+
+	console.log("✅ Created relation types")
+
 	// Create a character relationship
 	await prisma.characterRelation.create({
 		data: {
 			fromCharacterId: character1.id,
 			toCharacterId: character2.id,
-			relationType: "friends",
+			relationTypeId: friendsRelationType.id,
 			isBidirectional: true,
 		},
 	})
