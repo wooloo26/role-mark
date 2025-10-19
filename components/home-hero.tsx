@@ -1,5 +1,3 @@
-"use client"
-
 import { Settings2, Sparkles } from "lucide-react"
 import Link from "next/link"
 import { ThemeCustomizer } from "@/components/theme/theme-customizer"

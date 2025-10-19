@@ -1,27 +1,29 @@
-"use client"
-
-import { Plus, Users } from "lucide-react"
-import Link from "next/link"
-import { useState } from "react"
+import { Users } from "lucide-react"
 import { CharacterCard } from "@/components/characters/character-card"
-import { CharacterFilterDialog } from "@/components/characters/character-filter-dialog"
-import { CharacterSkeleton } from "@/components/characters/character-skeleton"
-import { ActiveFiltersBar } from "@/components/layout/active-filters-bar"
+import { CharactersListClient } from "@/components/characters/characters-list-client"
+import { CharactersPaginationClient } from "@/components/characters/characters-pagination-client"
 import { EmptyState } from "@/components/layout/empty-state"
 import { HeroSection } from "@/components/layout/hero-section"
-import { Pagination } from "@/components/layout/pagination"
-import { SearchBar } from "@/components/layout/search-bar"
-import { Button } from "@/components/ui/button"
-import { trpc } from "@/lib/trpc/client"
+import { api } from "@/lib/trpc/server"
 
-export default function CharactersPage() {
-	const [searchQuery, setSearchQuery] = useState("")
-	const [selectedTags, setSelectedTags] = useState<string[]>([])
-	const [filterOpen, setFilterOpen] = useState(false)
-	const [limit] = useState(20)
-	const [offset, setOffset] = useState(0)
+interface CharactersPageProps {
+	searchParams: Promise<{
+		search?: string
+		tags?: string
+		offset?: string
+	}>
+}
 
-	const { data, isLoading } = trpc.character.search.useQuery({
+export default async function CharactersPage({
+	searchParams,
+}: CharactersPageProps) {
+	const params = await searchParams
+	const searchQuery = params.search || ""
+	const selectedTags = params.tags ? params.tags.split(",") : []
+	const offset = Number(params.offset) || 0
+	const limit = 20
+
+	const data = await (await api()).character.search({
 		name: searchQuery || undefined,
 		tagIds: selectedTags.length > 0 ? selectedTags : undefined,
 		limit,
@@ -32,17 +34,6 @@ export default function CharactersPage() {
 	const total = data?.total || 0
 	const hasMore = data?.hasMore || false
 
-	const handleTagsChange = (tags: string[]) => {
-		setSelectedTags(tags)
-		setOffset(0)
-	}
-
-	const clearFilters = () => {
-		setSelectedTags([])
-		setSearchQuery("")
-		setOffset(0)
-	}
-
 	return (
 		<div className="min-h-screen">
 			<HeroSection
@@ -52,58 +43,18 @@ export default function CharactersPage() {
 			/>
 
 			<section className="container mx-auto px-4 pb-16">
-				<SearchBar
-					value={searchQuery}
-					onChange={(value) => {
-						setSearchQuery(value)
-						setOffset(0)
-					}}
-					placeholder="Search characters..."
-					actions={
-						<>
-							<CharacterFilterDialog
-								open={filterOpen}
-								onOpenChange={setFilterOpen}
-								selectedTags={selectedTags}
-								onTagsChange={handleTagsChange}
-								onClearFilters={clearFilters}
-							/>
-							<Button asChild className="gap-2">
-								<Link href="/characters/new">
-									<Plus className="h-4 w-4" />
-									New Character
-								</Link>
-							</Button>
-						</>
-					}
-				/>
-
-				<ActiveFiltersBar
-					searchQuery={searchQuery}
-					onClearSearch={() => {
-						setSearchQuery("")
-						setOffset(0)
-					}}
-					filterCount={selectedTags.length}
-					filterLabel="tag"
-					onClearFilters={() => {
-						setSelectedTags([])
-						setOffset(0)
-					}}
-					onClearAll={clearFilters}
+				<CharactersListClient
+					initialSearch={searchQuery}
+					initialTags={selectedTags}
 				/>
 
 				<div className="mb-6">
 					<p className="text-sm text-muted-foreground">
-						{isLoading
-							? "Loading..."
-							: `${total} character${total !== 1 ? "s" : ""} found`}
+						{total} character{total !== 1 ? "s" : ""} found
 					</p>
 				</div>
 
-				{isLoading ? (
-					<CharacterSkeleton />
-				) : characters.length === 0 ? (
+				{characters.length === 0 ? (
 					<EmptyState
 						icon={Users}
 						title="No characters found"
@@ -125,11 +76,10 @@ export default function CharactersPage() {
 					</div>
 				)}
 
-				{!isLoading && characters.length > 0 && (
-					<Pagination
+				{characters.length > 0 && (
+					<CharactersPaginationClient
 						currentOffset={offset}
-						onPrevious={() => setOffset(Math.max(0, offset - limit))}
-						onNext={() => setOffset(offset + limit)}
+						limit={limit}
 						hasMore={hasMore}
 					/>
 				)}

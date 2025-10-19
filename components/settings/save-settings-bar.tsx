@@ -10,7 +10,7 @@ interface SaveSettingsBarProps {
 export function SaveSettingsBar({ isSaving, onSave }: SaveSettingsBarProps) {
 	return (
 		<Card className="border-1 border-primary/20 bg-primary/5">
-			<CardContent className="pt-6">
+			<CardContent>
 				<div className="flex flex-col sm:flex-row items-center justify-between gap-4">
 					<div className="flex items-center gap-3">
 						{isSaving ? (

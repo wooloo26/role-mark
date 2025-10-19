@@ -1,5 +1,3 @@
-"use client"
-
 import {
 	ArrowLeft,
 	FileText,
@@ -8,11 +6,9 @@ import {
 	MessageSquare,
 } from "lucide-react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { use } from "react"
 import { CharacterAvatarCard } from "@/components/characters/character-avatar-card"
 import { CharacterCommentsTab } from "@/components/characters/character-comments-tab"
-import { CharacterDetailHeader } from "@/components/characters/character-detail-header"
+import { CharacterDetailClient } from "@/components/characters/character-detail-client"
 import { CharacterInfoCard } from "@/components/characters/character-info-card"
 import { CharacterPortraitCard } from "@/components/characters/character-portrait-card"
 import { CharacterRelationsTab } from "@/components/characters/character-relations-tab"
@@ -20,48 +16,17 @@ import { CharacterResourcesTab } from "@/components/characters/character-resourc
 import { CharacterWikiTab } from "@/components/characters/character-wiki-tab"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { trpc } from "@/lib/trpc/client"
+import { api } from "@/lib/trpc/server"
 
 interface CharacterDetailPageProps {
 	params: Promise<{ id: string }>
 }
 
-export default function CharacterDetailPage({
+export default async function CharacterDetailPage({
 	params,
 }: CharacterDetailPageProps) {
-	const { id } = use(params)
-	const router = useRouter()
-	const { data: character, isLoading } = trpc.character.getById.useQuery({ id })
-	const deleteMutation = trpc.character.delete.useMutation({
-		onSuccess: () => {
-			router.push("/characters")
-		},
-	})
-
-	const handleDelete = () => {
-		if (character) {
-			deleteMutation.mutate({ id: character.id })
-		}
-	}
-
-	if (isLoading) {
-		return (
-			<div className="container mx-auto px-4 py-8">
-				<div className="animate-pulse space-y-8">
-					<div className="h-8 bg-muted rounded w-48" />
-					<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-						<div className="lg:col-span-1">
-							<div className="h-96 bg-muted rounded" />
-						</div>
-						<div className="lg:col-span-2 space-y-4">
-							<div className="h-12 bg-muted rounded w-3/4" />
-							<div className="h-32 bg-muted rounded" />
-						</div>
-					</div>
-				</div>
-			</div>
-		)
-	}
+	const { id } = await params
+	const character = await (await api()).character.getById({ id })
 
 	if (!character) {
 		return (
@@ -79,11 +44,9 @@ export default function CharacterDetailPage({
 
 	return (
 		<div className="container mx-auto px-4 py-8">
-			<CharacterDetailHeader
+			<CharacterDetailClient
 				characterId={character.id}
 				characterName={character.name}
-				onDelete={handleDelete}
-				isDeleting={deleteMutation.isPending}
 			/>
 
 			{/* Main Content */}
