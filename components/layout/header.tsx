@@ -22,6 +22,7 @@ const navigation = [
 	{ name: "Wiki", href: "/wiki" },
 	{ name: "Tags", href: "/tags" },
 	{ name: "Attributes", href: "/static-tags" },
+	{ name: "Relations", href: "/relations" },
 ]
 
 export function Header() {

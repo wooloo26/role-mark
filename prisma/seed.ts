@@ -231,10 +231,57 @@ async function main() {
 	console.log("✅ Created sample characters:", character1.name, character2.name)
 
 	// Create relation types
-	const friendsRelationType = await prisma.relationType.create({
-		data: {
+	const friendsRelationType = await prisma.relationType.upsert({
+		where: { name: "friends" },
+		update: {},
+		create: {
 			name: "friends",
 			description: "Characters who are friends with each other",
+		},
+	})
+
+	await prisma.relationType.upsert({
+		where: { name: "rivals" },
+		update: {},
+		create: {
+			name: "rivals",
+			description: "Characters who compete or oppose each other",
+		},
+	})
+
+	await prisma.relationType.upsert({
+		where: { name: "siblings" },
+		update: {},
+		create: {
+			name: "siblings",
+			description: "Characters who are siblings",
+		},
+	})
+
+	await prisma.relationType.upsert({
+		where: { name: "mentor" },
+		update: {},
+		create: {
+			name: "mentor",
+			description: "One character mentors or teaches another",
+		},
+	})
+
+	await prisma.relationType.upsert({
+		where: { name: "allies" },
+		update: {},
+		create: {
+			name: "allies",
+			description: "Characters who work together toward common goals",
+		},
+	})
+
+	await prisma.relationType.upsert({
+		where: { name: "enemies" },
+		update: {},
+		create: {
+			name: "enemies",
+			description: "Characters who are adversaries",
 		},
 	})
 

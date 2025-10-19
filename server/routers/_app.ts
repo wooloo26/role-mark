@@ -4,6 +4,7 @@
 import { createTRPCRouter } from "../trpc"
 import { characterRouter } from "./character"
 import { commentRouter } from "./comment"
+import { relationRouter } from "./relation"
 import { resourceRouter } from "./resource"
 import { staticTagRouter } from "./static-tag"
 import { tagRouter } from "./tag"
@@ -18,6 +19,7 @@ export const appRouter = createTRPCRouter({
 	user: userRouter,
 	tag: tagRouter,
 	staticTag: staticTagRouter,
+	relation: relationRouter,
 })
 
 // Export type definition of API

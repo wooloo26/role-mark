@@ -1,6 +1,6 @@
 "use client"
 
-import { useRouter, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import type { ReactNode } from "react"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
@@ -13,18 +13,22 @@ export function StaticTagsTabSwitcher({
 	initialTab,
 	children,
 }: StaticTagsTabSwitcherProps) {
-	const router = useRouter()
 	const searchParams = useSearchParams()
 
 	const handleTabChange = (tab: string) => {
 		const params = new URLSearchParams(searchParams)
 		params.set("tab", tab)
-		router.push(`/static-tags?${params.toString()}`)
+		const newUrl = `${window.location.pathname}?${params.toString()}`
+		window.history.replaceState({}, "", newUrl)
 	}
 
 	return (
-		<Tabs value={initialTab} onValueChange={handleTabChange} className="w-full">
-			<TabsList className="w-full sm:w-auto mb-6">
+		<Tabs
+			defaultValue={initialTab}
+			onValueChange={handleTabChange}
+			className="space-y-6"
+		>
+			<TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
 				<TabsTrigger value="static-tags">Attributes</TabsTrigger>
 				<TabsTrigger value="statistics">Statistics</TabsTrigger>
 			</TabsList>

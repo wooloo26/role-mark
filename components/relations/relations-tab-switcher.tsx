@@ -1,23 +1,22 @@
 "use client"
 
-import { FolderTree, Tag as TagIcon } from "lucide-react"
 import { useSearchParams } from "next/navigation"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-interface TagsTabSwitcherProps {
-	initialTab: string
+interface RelationsTabSwitcherProps {
 	children: React.ReactNode
+	initialTab?: string
 }
 
-export function TagsTabSwitcher({
-	initialTab,
+export function RelationsTabSwitcher({
 	children,
-}: TagsTabSwitcherProps) {
+	initialTab = "types",
+}: RelationsTabSwitcherProps) {
 	const searchParams = useSearchParams()
 
-	const handleTabChange = (tab: string) => {
+	const handleTabChange = (value: string) => {
 		const params = new URLSearchParams(searchParams)
-		params.set("tab", tab)
+		params.set("tab", value)
 		const newUrl = `${window.location.pathname}?${params.toString()}`
 		window.history.replaceState({}, "", newUrl)
 	}
@@ -29,14 +28,8 @@ export function TagsTabSwitcher({
 			className="space-y-6"
 		>
 			<TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
-				<TabsTrigger value="tags">
-					<TagIcon className="h-4 w-4 mr-2" />
-					Tags
-				</TabsTrigger>
-				<TabsTrigger value="groups">
-					<FolderTree className="h-4 w-4 mr-2" />
-					Tag Groups
-				</TabsTrigger>
+				<TabsTrigger value="types">Relations</TabsTrigger>
+				<TabsTrigger value="statistics">Statistics</TabsTrigger>
 			</TabsList>
 			{children}
 		</Tabs>
