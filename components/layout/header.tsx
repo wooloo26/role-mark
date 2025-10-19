@@ -24,10 +24,10 @@ const navigation = [
 
 export function Header() {
 	const pathname = usePathname()
-	const { data: session } = useSession()
+	const { data: session, status } = useSession()
 
 	return (
-		<header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 shadow-sm">
+		<header className="sticky top-0 z-50 w-full border-b-1 border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 ">
 			<div className="container mx-auto flex h-16 items-center px-4">
 				<div className="mr-4 flex">
 					<Link
@@ -56,7 +56,9 @@ export function Header() {
 				</div>
 				<div className="ml-auto flex items-center space-x-2">
 					<ThemeToggle />
-					{session ? (
+					{status === "loading" ? (
+						<div className="h-10 w-10 rounded-full bg-secondary/50 animate-pulse" />
+					) : session ? (
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
 								<Button

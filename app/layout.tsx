@@ -41,9 +41,9 @@ export default function RootLayout({
 					<ThemeScript />
 					<SessionProvider>
 						<TRPCProvider>
-							<div className="relative flex min-h-screen flex-col">
+							<div className="relative flex min-h-screen flex-col bg-gradient-to-br from-background via-background to-muted/20">
 								<Header />
-								<main className="flex-1 mx-auto">{children}</main>
+								<main className="flex-1 w-full">{children}</main>
 								<Footer />
 							</div>
 						</TRPCProvider>

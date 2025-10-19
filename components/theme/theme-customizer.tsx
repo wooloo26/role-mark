@@ -170,7 +170,7 @@ export function ThemeCustomizer() {
 								<p className="text-sm font-medium">Preview:</p>
 								<div className="flex gap-2">
 									<div className="h-16 w-16 bg-primary rounded-[var(--radius)]" />
-									<div className="h-16 w-24 bg-secondary rounded-[calc(var(--radius)-2px)] border-2 border-border" />
+									<div className="h-16 w-24 bg-secondary rounded-[calc(var(--radius)-2px)] border-1 border-border" />
 								</div>
 							</div>
 						</div>
@@ -263,7 +263,7 @@ export function ThemeCustomizer() {
 										componentTheme.cardStyle === "flat"
 											? "bg-card ring-2 ring-primary"
 											: "bg-card"
-									} ${componentTheme.cardStyle === "bordered" ? "border-2" : ""} ${
+									} ${componentTheme.cardStyle === "bordered" ? "border-1" : ""} ${
 										componentTheme.cardStyle === "elevated" ? "shadow-lg" : ""
 									}`}
 								>

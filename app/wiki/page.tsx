@@ -1,17 +1,20 @@
 "use client"
 
-import { BookOpen, Loader2, Plus, Search } from "lucide-react"
+import { BookOpen, Clock, Loader2, Plus, Search, User } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import {
 	Card,
 	CardDescription,
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card"
+import { DotPattern } from "@/components/ui/dot-pattern"
 import { Input } from "@/components/ui/input"
+import { ShimmerButton } from "@/components/ui/shimmer-button"
 import { trpc } from "@/lib/trpc/client"
+import { cn } from "@/lib/utils"
 
 export default function WikiPage() {
 	const [searchQuery, setSearchQuery] = useState("")
@@ -23,20 +26,33 @@ export default function WikiPage() {
 	const wikiPages = data?.wikiPages ?? []
 
 	return (
-		<div className="container py-8">
-			<div className="flex flex-col gap-6">
+		<div className="container relative py-8 mx-auto">
+			<DotPattern
+				className={cn(
+					"[mask-image:radial-gradient(700px_circle_at_center,white,transparent)]",
+					"absolute inset-0 -z-10",
+				)}
+			/>
+			<div className="flex flex-col gap-8">
 				{/* Header */}
-				<div className="flex items-center justify-between">
-					<div>
-						<h1 className="text-3xl font-bold tracking-tight">Wiki</h1>
-						<p className="text-muted-foreground">Browse and edit wiki pages</p>
+				<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+					<div className="space-y-2">
+						<h1 className="text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/60">
+							Wiki Library
+						</h1>
+						<p className="text-lg text-muted-foreground">
+							Browse and edit your knowledge base
+						</p>
 					</div>
-					<Button asChild>
-						<Link href="/wiki/new">
-							<Plus className="mr-2 h-4 w-4" />
+					<ShimmerButton className="shadow-lg" shimmerSize="0.15em">
+						<Link
+							href="/wiki/new"
+							className="flex items-center gap-2 px-4 py-2"
+						>
+							<Plus className="h-4 w-4" />
 							Create Page
 						</Link>
-					</Button>
+					</ShimmerButton>
 				</div>
 
 				{/* Search */}
@@ -52,30 +68,49 @@ export default function WikiPage() {
 
 				{/* Wiki List */}
 				{isLoading ? (
-					<div className="flex justify-center items-center py-12">
-						<Loader2 className="h-8 w-8 animate-spin text-primary" />
+					<div className="flex flex-col justify-center items-center py-20 gap-4">
+						<Loader2 className="h-12 w-12 animate-spin text-primary" />
+						<p className="text-muted-foreground">Loading wiki pages...</p>
 					</div>
 				) : (
-					<div className="grid gap-4">
+					<div className="grid gap-4 md:gap-6">
 						{wikiPages.map((page) => (
 							<Link key={page.id} href={`/wiki/${page.id}`}>
-								<Card className="transition-shadow hover:shadow-lg">
+								<Card className="group transition-all duration-300 hover:shadow-xl hover:scale-[1.02] border-1 hover:border-primary/50">
 									<CardHeader>
-										<div className="flex items-start gap-4">
-											<BookOpen className="h-8 w-8 text-primary mt-1" />
-											<div className="flex-1">
-												<CardTitle>{page.title}</CardTitle>
+										<div className="flex items-start gap-5">
+											<div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+												<BookOpen className="h-7 w-7 text-primary" />
+											</div>
+											<div className="flex-1 min-w-0">
+												<div className="flex items-start justify-between gap-4 mb-2">
+													<CardTitle className="text-xl group-hover:text-primary transition-colors">
+														{page.title}
+													</CardTitle>
+													<Badge variant="secondary" className="shrink-0">
+														{page.content
+															? `${page.content.length} chars`
+															: "Empty"}
+													</Badge>
+												</div>
 												{page.content && (
-													<CardDescription className="line-clamp-2 mt-2">
-														{page.content.substring(0, 200)}...
+													<CardDescription className="line-clamp-2 text-base leading-relaxed">
+														{page.content.substring(0, 200)}
+														{page.content.length > 200 && "..."}
 													</CardDescription>
 												)}
-												<div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-													<span>
+												<div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-muted-foreground">
+													<span className="flex items-center gap-1.5">
+														<Clock className="h-4 w-4" />
 														Updated{" "}
 														{new Date(page.updatedAt).toLocaleDateString()}
 													</span>
-													{page.author && <span>by {page.author.name}</span>}
+													{page.author && (
+														<span className="flex items-center gap-1.5">
+															<User className="h-4 w-4" />
+															{page.author.name}
+														</span>
+													)}
 												</div>
 											</div>
 										</div>
@@ -87,19 +122,32 @@ export default function WikiPage() {
 				)}
 
 				{!isLoading && wikiPages.length === 0 && (
-					<div className="flex flex-col items-center justify-center py-12 text-center">
-						<p className="text-lg text-muted-foreground mb-4">
-							{searchQuery
-								? "No wiki pages found matching your search"
-								: "No wiki pages yet"}
-						</p>
-						<Button asChild>
-							<Link href="/wiki/new">
-								<Plus className="mr-2 h-4 w-4" />
-								Create your first wiki page
-							</Link>
-						</Button>
-					</div>
+					<Card className="border-1 border-dashed">
+						<CardHeader className="text-center py-16">
+							<div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-muted">
+								<BookOpen className="h-10 w-10 text-muted-foreground" />
+							</div>
+							<CardTitle className="text-2xl mb-2">
+								{searchQuery ? "No Results Found" : "No Wiki Pages Yet"}
+							</CardTitle>
+							<CardDescription className="text-base mb-6">
+								{searchQuery
+									? "Try adjusting your search terms"
+									: "Start building your knowledge base by creating your first wiki page"}
+							</CardDescription>
+							<div className="flex justify-center">
+								<ShimmerButton className="shadow-lg" shimmerSize="0.15em">
+									<Link
+										href="/wiki/new"
+										className="flex items-center gap-2 px-6 py-2"
+									>
+										<Plus className="h-4 w-4" />
+										Create your first wiki page
+									</Link>
+								</ShimmerButton>
+							</div>
+						</CardHeader>
+					</Card>
 				)}
 			</div>
 		</div>

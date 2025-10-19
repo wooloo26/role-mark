@@ -12,7 +12,6 @@ import {
 	Users,
 } from "lucide-react"
 import Link from "next/link"
-import { useState } from "react"
 import { ThemeCustomizer } from "@/components/theme/theme-customizer"
 import { AnimatedGradientText } from "@/components/ui/animated-gradient-text"
 import { BentoCard, BentoGrid } from "@/components/ui/bento-grid"
@@ -37,7 +36,6 @@ import { ShimmerButton } from "@/components/ui/shimmer-button"
 import { cn } from "@/lib/utils"
 
 export default function Home() {
-	const [isCustomizerOpen, setIsCustomizerOpen] = useState(false)
 	return (
 		<div className="flex flex-col min-h-screen ">
 			{/* Hero Section */}
@@ -95,7 +93,7 @@ export default function Home() {
 					</div>
 
 					<div className="mt-8">
-						<Dialog open={isCustomizerOpen} onOpenChange={setIsCustomizerOpen}>
+						<Dialog>
 							<DialogTrigger asChild>
 								<Button variant="ghost" size="sm" className="gap-2">
 									<Settings2 className="h-4 w-4" />
@@ -118,7 +116,7 @@ export default function Home() {
 			</section>
 
 			{/* Features Section */}
-			<section className="container px-4 py-20">
+			<section className="container px-4 py-20 mx-auto">
 				<div className="text-center space-y-4 mb-16">
 					<h2 className="text-4xl font-bold tracking-tight">
 						Everything You Need
@@ -188,7 +186,7 @@ export default function Home() {
 
 				{/* Additional Features Cards */}
 				<div className="grid gap-6 md:grid-cols-3 mt-16 max-w-6xl mx-auto">
-					<Card className="border-2 hover:border-primary/50 transition-colors">
+					<Card className="border-1 hover:border-primary/50 transition-colors">
 						<CardHeader>
 							<Link2 className="h-10 w-10 mb-3 text-primary" />
 							<CardTitle>Character Relationships</CardTitle>
@@ -197,7 +195,7 @@ export default function Home() {
 							</CardDescription>
 						</CardHeader>
 					</Card>
-					<Card className="border-2 hover:border-primary/50 transition-colors">
+					<Card className="border-1 hover:border-primary/50 transition-colors">
 						<CardHeader>
 							<Database className="h-10 w-10 mb-3 text-primary" />
 							<CardTitle>Type-Safe APIs</CardTitle>
@@ -206,7 +204,7 @@ export default function Home() {
 							</CardDescription>
 						</CardHeader>
 					</Card>
-					<Card className="border-2 hover:border-primary/50 transition-colors">
+					<Card className="border-1 hover:border-primary/50 transition-colors">
 						<CardHeader>
 							<Sparkles className="h-10 w-10 mb-3 text-primary" />
 							<CardTitle>AI Assistance</CardTitle>
@@ -219,8 +217,8 @@ export default function Home() {
 			</section>
 
 			{/* CTA Section */}
-			<section className="container px-4 py-20">
-				<div className="relative rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-background border-2 border-primary/20 p-12 text-center space-y-6 overflow-hidden">
+			<section className="container px-4 py-20 mx-auto">
+				<div className="relative rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-background border-1 border-primary/20 p-12 text-center space-y-6 overflow-hidden">
 					<DotPattern
 						className={cn(
 							"[mask-image:radial-gradient(400px_circle_at_center,white,transparent)]",
