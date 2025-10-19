@@ -35,6 +35,7 @@ const updateTagSchema = z.object({
 		)
 		.optional(),
 	groupId: z.string().nullable().optional(),
+	pinned: z.boolean().optional(),
 })
 
 const tagSearchSchema = z.object({
@@ -54,6 +55,7 @@ const createTagGroupSchema = z.object({
 const updateTagGroupSchema = z.object({
 	id: z.string(),
 	name: z.string().min(1).max(100).optional(),
+	pinned: z.boolean().optional(),
 })
 
 export const tagRouter = createTRPCRouter({
@@ -145,9 +147,7 @@ export const tagRouter = createTRPCRouter({
 					where,
 					take: input.limit,
 					skip: input.offset,
-					orderBy: {
-						name: "asc",
-					},
+					orderBy: [{ pinned: "desc" }, { name: "asc" }],
 					include: {
 						group: true,
 						_count: {
@@ -174,9 +174,7 @@ export const tagRouter = createTRPCRouter({
 		.query(async ({ ctx, input }) => {
 			return await ctx.prisma.tag.findMany({
 				where: { scope: input.scope },
-				orderBy: {
-					name: "asc",
-				},
+				orderBy: [{ pinned: "desc" }, { name: "asc" }],
 				include: {
 					group: true,
 					_count: {
@@ -297,6 +295,30 @@ export const tagRouter = createTRPCRouter({
 			})
 		}),
 
+	// Toggle pinned status (protected)
+	togglePinned: protectedProcedure
+		.input(z.object({ id: z.string() }))
+		.mutation(async ({ ctx, input }) => {
+			const tag = await ctx.prisma.tag.findUnique({
+				where: { id: input.id },
+			})
+
+			if (!tag) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Tag not found",
+				})
+			}
+
+			return await ctx.prisma.tag.update({
+				where: { id: input.id },
+				data: { pinned: !tag.pinned },
+				include: {
+					group: true,
+				},
+			})
+		}),
+
 	// ============================================
 	// TAG GROUP OPERATIONS
 	// ============================================
@@ -332,14 +354,10 @@ export const tagRouter = createTRPCRouter({
 		.query(async ({ ctx, input }) => {
 			return await ctx.prisma.tagGroup.findMany({
 				where: input.scope ? { scope: input.scope } : undefined,
-				orderBy: {
-					name: "asc",
-				},
+				orderBy: [{ pinned: "desc" }, { name: "asc" }],
 				include: {
 					tags: {
-						orderBy: {
-							name: "asc",
-						},
+						orderBy: [{ pinned: "desc" }, { name: "asc" }],
 					},
 				},
 			})
@@ -381,6 +399,30 @@ export const tagRouter = createTRPCRouter({
 			})
 		}),
 
+	// Toggle tag group pinned status (protected)
+	toggleGroupPinned: protectedProcedure
+		.input(z.object({ id: z.string() }))
+		.mutation(async ({ ctx, input }) => {
+			const group = await ctx.prisma.tagGroup.findUnique({
+				where: { id: input.id },
+			})
+
+			if (!group) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Tag group not found",
+				})
+			}
+
+			return await ctx.prisma.tagGroup.update({
+				where: { id: input.id },
+				data: { pinned: !group.pinned },
+				include: {
+					tags: true,
+				},
+			})
+		}),
+
 	// ============================================
 	// UTILITY OPERATIONS
 	// ============================================
@@ -392,10 +434,10 @@ export const tagRouter = createTRPCRouter({
 			const [groupedTags, ungroupedTags] = await Promise.all([
 				ctx.prisma.tagGroup.findMany({
 					where: { scope: input.scope },
-					orderBy: { name: "asc" },
+					orderBy: [{ pinned: "desc" }, { name: "asc" }],
 					include: {
 						tags: {
-							orderBy: { name: "asc" },
+							orderBy: [{ pinned: "desc" }, { name: "asc" }],
 							include: {
 								_count: {
 									select: {
@@ -412,7 +454,7 @@ export const tagRouter = createTRPCRouter({
 						scope: input.scope,
 						groupId: null,
 					},
-					orderBy: { name: "asc" },
+					orderBy: [{ pinned: "desc" }, { name: "asc" }],
 					include: {
 						_count: {
 							select: {

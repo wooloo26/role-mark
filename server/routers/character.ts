@@ -69,6 +69,11 @@ export const characterRouter = createTRPCRouter({
 								},
 							},
 						},
+						orderBy: {
+							tag: {
+								pinned: "desc",
+							},
+						},
 					},
 					resources: {
 						include: {
@@ -271,6 +276,11 @@ export const characterRouter = createTRPCRouter({
 									include: {
 										group: true,
 									},
+								},
+							},
+							orderBy: {
+								tag: {
+									pinned: "desc",
 								},
 							},
 						},

@@ -30,11 +30,13 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
 import { trpc } from "@/lib/trpc/client"
 
 const formSchema = z.object({
 	name: z.string().min(1, "Name is required").max(100),
 	scope: z.nativeEnum(TagScope),
+	pinned: z.boolean().optional(),
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -57,6 +59,7 @@ export function CreateTagGroupDialog({
 		defaultValues: {
 			name: "",
 			scope: defaultScope,
+			pinned: false,
 		},
 	})
 
@@ -130,6 +133,27 @@ export function CreateTagGroupDialog({
 										Where tags in this group can be used
 									</FormDescription>
 									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<FormField
+							control={form.control}
+							name="pinned"
+							render={({ field }) => (
+								<FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+									<div className="space-y-0.5">
+										<FormLabel>Pinned</FormLabel>
+										<FormDescription>
+											Pin this tag group to show it at the top of lists
+										</FormDescription>
+									</div>
+									<FormControl>
+										<Switch
+											checked={field.value}
+											onCheckedChange={field.onChange}
+										/>
+									</FormControl>
 								</FormItem>
 							)}
 						/>

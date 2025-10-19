@@ -1,6 +1,6 @@
 "use client"
 
-import { Edit, Hash, Trash2 } from "lucide-react"
+import { Edit, Hash, Pin, Trash2 } from "lucide-react"
 import { useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -20,6 +20,7 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog"
 import { trpc } from "@/lib/trpc/client"
+import { cn } from "@/lib/utils"
 
 interface TagCardProps {
 	tag: {
@@ -27,6 +28,7 @@ interface TagCardProps {
 		name: string
 		slug: string
 		scope: string
+		pinned: boolean
 		group?: { id: string; name: string } | null
 		_count: {
 			characterTags: number
@@ -48,17 +50,35 @@ export function TagCard({ tag, onEdit }: TagCardProps) {
 		},
 	})
 
+	const togglePinnedMutation = trpc.tag.togglePinned.useMutation({
+		onSuccess: () => {
+			utils.tag.getGroupedTags.invalidate()
+			utils.tag.search.invalidate()
+			utils.tag.getByScope.invalidate()
+		},
+	})
+
 	const totalUsage = tag._count.characterTags + tag._count.resourceTags
 
 	return (
 		<>
-			<Card className="group hover:shadow-lg transition-shadow">
+			<Card
+				className={cn(
+					"group hover:shadow-lg transition-shadow relative",
+					tag.pinned && "border-primary/50 bg-primary/5",
+				)}
+			>
 				<CardHeader className="pb-3">
 					<div className="flex items-start justify-between">
 						<div className="flex items-center gap-2 flex-1 min-w-0">
 							<Hash className="h-4 w-4 text-muted-foreground shrink-0" />
 							<div className="min-w-0 flex-1">
-								<CardTitle className="text-lg truncate">{tag.name}</CardTitle>
+								<CardTitle className="text-lg truncate flex items-center gap-2">
+									{tag.name}
+									{tag.pinned && (
+										<Pin className="h-3 w-3 text-primary fill-primary" />
+									)}
+								</CardTitle>
 								<CardDescription className="text-xs truncate">
 									{tag.slug}
 								</CardDescription>
@@ -78,7 +98,16 @@ export function TagCard({ tag, onEdit }: TagCardProps) {
 						<Badge variant="secondary">{totalUsage}</Badge>
 					</div>
 
-					<div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+					<div className="flex gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => togglePinnedMutation.mutate({ id: tag.id })}
+							disabled={togglePinnedMutation.isPending}
+							className={cn(tag.pinned && "text-primary")}
+						>
+							<Pin className={cn("h-3 w-3", tag.pinned && "fill-primary")} />
+						</Button>
 						<Button
 							variant="outline"
 							size="sm"

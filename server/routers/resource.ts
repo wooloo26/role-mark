@@ -212,6 +212,11 @@ export const resourceRouter = createTRPCRouter({
 									},
 								},
 							},
+							orderBy: {
+								tag: {
+									pinned: "desc",
+								},
+							},
 						},
 						_count: {
 							select: {
@@ -264,6 +269,11 @@ export const resourceRouter = createTRPCRouter({
 						tags: {
 							include: {
 								tag: true,
+							},
+							orderBy: {
+								tag: {
+									pinned: "desc",
+								},
 							},
 						},
 						_count: {

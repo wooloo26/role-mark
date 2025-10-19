@@ -292,25 +292,34 @@ export default function CharactersPage() {
 												</CardDescription>
 											)}
 
-											{/* Tags */}
-											{character.tags && character.tags.length > 0 && (
-												<div className="flex flex-wrap gap-1">
-													{character.tags.slice(0, 3).map((ct) => (
-														<Badge
-															key={ct.tag.id}
-															variant="secondary"
-															className="text-xs"
-														>
-															{ct.tag.name}
-														</Badge>
-													))}
-													{character.tags.length > 3 && (
-														<Badge variant="outline" className="text-xs">
-															+{character.tags.length - 3}
-														</Badge>
-													)}
-												</div>
-											)}
+											{/* Tags - Show only pinned */}
+											{character.tags &&
+												character.tags.length > 0 &&
+												(() => {
+													const pinnedTags = character.tags.filter(
+														(ct) => ct.tag.pinned,
+													)
+													return (
+														<div className="flex flex-wrap gap-1">
+															{pinnedTags.map((ct) => (
+																<Badge
+																	key={ct.tag.id}
+																	variant="secondary"
+																	className="text-xs"
+																>
+																	{ct.tag.name}
+																</Badge>
+															))}
+															{pinnedTags.length === 0 &&
+																character.tags.length > 0 && (
+																	<span className="text-xs text-muted-foreground italic">
+																		{character.tags.length} tag
+																		{character.tags.length !== 1 ? "s" : ""}
+																	</span>
+																)}
+														</div>
+													)
+												})()}
 
 											{/* Stats */}
 											<div className="flex items-center gap-4 text-xs text-muted-foreground pt-2 border-t">

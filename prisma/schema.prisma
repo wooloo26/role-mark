@@ -272,12 +272,14 @@ model TagGroup {
   id        String   @id @default(cuid())
   name      String
   scope     TagScope
+  pinned    Boolean  @default(false)
   tags      Tag[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([name])
   @@index([scope])
+  @@index([pinned])
   @@map("tag_groups")
 }
 
@@ -287,6 +289,7 @@ model Tag {
   slug          String         @unique
   groupId       String?
   scope         TagScope
+  pinned        Boolean        @default(false)
   group         TagGroup?      @relation(fields: [groupId], references: [id], onDelete: SetNull)
   characterTags CharacterTag[]
   resourceTags  ResourceTag[]
@@ -295,6 +298,7 @@ model Tag {
 
   @@index([name])
   @@index([scope])
+  @@index([pinned])
   @@map("tags")
 }
 

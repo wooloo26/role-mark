@@ -1,6 +1,6 @@
 "use client"
 
-import { Edit, FolderTree, Hash, Trash2 } from "lucide-react"
+import { Edit, FolderTree, Hash, Pin, Trash2 } from "lucide-react"
 import { useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -20,12 +20,14 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog"
 import { trpc } from "@/lib/trpc/client"
+import { cn } from "@/lib/utils"
 
 interface TagGroupCardProps {
 	group: {
 		id: string
 		name: string
 		scope: string
+		pinned: boolean
 		tags: Array<{
 			id: string
 			name: string
@@ -46,17 +48,34 @@ export function TagGroupCard({ group, onEdit }: TagGroupCardProps) {
 		},
 	})
 
+	const togglePinnedMutation = trpc.tag.toggleGroupPinned.useMutation({
+		onSuccess: () => {
+			utils.tag.listGroups.invalidate()
+			utils.tag.getGroupedTags.invalidate()
+		},
+	})
+
 	const hasRelations = group.tags.length > 0
 
 	return (
 		<>
-			<Card className="group hover:shadow-lg transition-shadow">
+			<Card
+				className={cn(
+					"group hover:shadow-lg transition-shadow",
+					group.pinned && "border-primary/50 bg-primary/5",
+				)}
+			>
 				<CardHeader>
 					<div className="flex items-start justify-between">
 						<div className="flex items-center gap-2 flex-1">
 							<FolderTree className="h-5 w-5 text-muted-foreground" />
 							<div>
-								<CardTitle className="text-lg">{group.name}</CardTitle>
+								<CardTitle className="text-lg flex items-center gap-2">
+									{group.name}
+									{group.pinned && (
+										<Pin className="h-3 w-3 text-primary fill-primary" />
+									)}
+								</CardTitle>
 								<CardDescription className="text-xs capitalize">
 									{group.scope.toLowerCase()}
 								</CardDescription>
@@ -90,6 +109,15 @@ export function TagGroupCard({ group, onEdit }: TagGroupCardProps) {
 					)}
 
 					<div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => togglePinnedMutation.mutate({ id: group.id })}
+							disabled={togglePinnedMutation.isPending}
+							className={cn(group.pinned && "text-primary")}
+						>
+							<Pin className={cn("h-3 w-3", group.pinned && "fill-primary")} />
+						</Button>
 						<Button
 							variant="outline"
 							size="sm"
