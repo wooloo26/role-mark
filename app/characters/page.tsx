@@ -260,20 +260,20 @@ export default function CharactersPage() {
 						{characters.map((character) => (
 							<Link key={character.id} href={`/characters/${character.id}`}>
 								<Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden h-full">
-									<CardHeader className="p-0">
+									<CardHeader className="p-0 h-full flex flex-col">
 										{/* Character Image */}
-										<div className="relative w-full h-48 bg-primary overflow-hidden">
+										<div className="relative w-50 h-50 overflow-hidden rounded-xl mx-auto">
 											{character.avatarUrl ? (
 												<Image
 													src={character.avatarUrl}
 													alt={character.name}
 													fill
-													className="object-cover group-hover:scale-110 transition-transform duration-300"
+													className="object-cover"
 												/>
 											) : (
 												<div className="w-full h-full flex items-center justify-center">
-													<Avatar className="h-24 w-24">
-														<AvatarFallback className="text-4xl">
+													<Avatar className="h-50 w-50 rounded-lg">
+														<AvatarFallback className="text-4xl rounded-lg">
 															{character.name.charAt(0).toUpperCase()}
 														</AvatarFallback>
 													</Avatar>
@@ -282,7 +282,7 @@ export default function CharactersPage() {
 										</div>
 
 										{/* Character Info */}
-										<div className="p-4 space-y-3">
+										<div className="pl-4 pr-4 space-y-3 flex-1 w-full flex flex-col">
 											<CardTitle className="line-clamp-1">
 												{character.name}
 											</CardTitle>
@@ -293,25 +293,27 @@ export default function CharactersPage() {
 											)}
 
 											{/* Tags - Show tags from pinned groups and individually pinned tags */}
-											{character.tags &&
-												(() => {
-													const pinnedTags = character.tags.filter(
-														(ct) => ct.tag.pinned || ct.tag.group?.pinned,
-													)
-													return (
-														<div className="flex flex-wrap gap-1">
-															{pinnedTags.map((ct) => (
-																<Badge
-																	key={ct.tag.id}
-																	variant="secondary"
-																	className="text-xs"
-																>
-																	{ct.tag.name}
-																</Badge>
-															))}
-														</div>
-													)
-												})()}
+											<div className="flex-1">
+												{character.tags &&
+													(() => {
+														const pinnedTags = character.tags.filter(
+															(ct) => ct.tag.pinned || ct.tag.group?.pinned,
+														)
+														return (
+															<div className="flex flex-wrap gap-1">
+																{pinnedTags.map((ct) => (
+																	<Badge
+																		key={ct.tag.id}
+																		variant="secondary"
+																		className="text-xs"
+																	>
+																		{ct.tag.name}
+																	</Badge>
+																))}
+															</div>
+														)
+													})()}
+											</div>
 
 											{/* Stats */}
 											<div className="flex items-center gap-4 text-xs text-muted-foreground pt-2 border-t">
