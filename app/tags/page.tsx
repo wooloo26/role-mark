@@ -1,9 +1,10 @@
 import { TagScope } from "@prisma/client"
-import { HeroSection } from "@/components/layout/hero-section"
+import { FolderTree, Tag as TagIcon } from "lucide-react"
+import { GenericTabSwitcher } from "@/components/layout/generic-tab-switcher"
+import { ManagementPageLayout } from "@/components/layout/management-page-layout"
 import { TagGroupsTabContent } from "@/components/tags/tag-groups-tab-content"
 import { TagsPageClient } from "@/components/tags/tags-page-client"
 import { TagsTabContent } from "@/components/tags/tags-tab-content"
-import { TagsTabSwitcher } from "@/components/tags/tags-tab-switcher"
 import { TabsContent } from "@/components/ui/tabs"
 import { api } from "@/lib/trpc/server"
 
@@ -44,35 +45,45 @@ export default async function TagsPage({ searchParams }: TagsPageProps) {
 		) || []
 
 	return (
-		<div className="min-h-screen">
-			<HeroSection
-				badge="Tag Management"
-				title="Tags & Groups"
-				description="Organize and manage tags for characters and resources"
-			/>
+		<ManagementPageLayout
+			badge="Tag Management"
+			title="Tags & Groups"
+			description="Organize and manage tags for characters and resources"
+		>
+			<GenericTabSwitcher
+				initialTab={currentTab}
+				tabs={[
+					{
+						value: "tags",
+						label: "Tags",
+						icon: <TagIcon className="h-4 w-4 mr-2" />,
+					},
+					{
+						value: "groups",
+						label: "Tag Groups",
+						icon: <FolderTree className="h-4 w-4 mr-2" />,
+					},
+				]}
+			>
+				<TagsPageClient
+					initialSearch={searchQuery}
+					initialScope={selectedScope}
+					initialTab={currentTab}
+				/>
 
-			<section className="container mx-auto px-4 pb-16">
-				<TagsTabSwitcher initialTab={currentTab}>
-					<TagsPageClient
-						initialSearch={searchQuery}
-						initialScope={selectedScope}
-						initialTab={currentTab}
+				{/* Tags Tab */}
+				<TabsContent value="tags" className="space-y-6">
+					<TagsTabContent
+						groupedTags={filteredGrouped}
+						ungroupedTags={filteredUngrouped}
 					/>
+				</TabsContent>
 
-					{/* Tags Tab */}
-					<TabsContent value="tags" className="space-y-6">
-						<TagsTabContent
-							groupedTags={filteredGrouped}
-							ungroupedTags={filteredUngrouped}
-						/>
-					</TabsContent>
-
-					{/* Tag Groups Tab */}
-					<TabsContent value="groups" className="space-y-6">
-						<TagGroupsTabContent tagGroups={filteredTagGroups} />
-					</TabsContent>
-				</TagsTabSwitcher>
-			</section>
-		</div>
+				{/* Tag Groups Tab */}
+				<TabsContent value="groups" className="space-y-6">
+					<TagGroupsTabContent tagGroups={filteredTagGroups} />
+				</TabsContent>
+			</GenericTabSwitcher>
+		</ManagementPageLayout>
 	)
 }

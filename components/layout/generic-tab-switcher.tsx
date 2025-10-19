@@ -1,18 +1,28 @@
 "use client"
 
-import { FolderTree, Tag as TagIcon } from "lucide-react"
 import { useSearchParams } from "next/navigation"
+import type { ReactNode } from "react"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-interface TagsTabSwitcherProps {
-	initialTab: string
-	children: React.ReactNode
+interface TabConfig {
+	value: string
+	label: string
+	icon?: ReactNode
 }
 
-export function TagsTabSwitcher({
+interface GenericTabSwitcherProps {
+	initialTab: string
+	tabs: TabConfig[]
+	children: ReactNode
+	className?: string
+}
+
+export function GenericTabSwitcher({
 	initialTab,
+	tabs,
 	children,
-}: TagsTabSwitcherProps) {
+	className = "space-y-6",
+}: GenericTabSwitcherProps) {
 	const searchParams = useSearchParams()
 
 	const handleTabChange = (tab: string) => {
@@ -26,17 +36,17 @@ export function TagsTabSwitcher({
 		<Tabs
 			defaultValue={initialTab}
 			onValueChange={handleTabChange}
-			className="space-y-6"
+			className={className}
 		>
-			<TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
-				<TabsTrigger value="tags">
-					<TagIcon className="h-4 w-4 mr-2" />
-					Tags
-				</TabsTrigger>
-				<TabsTrigger value="groups">
-					<FolderTree className="h-4 w-4 mr-2" />
-					Tag Groups
-				</TabsTrigger>
+			<TabsList
+				className={`grid w-full max-w-md mx-auto grid-cols-${tabs.length}`}
+			>
+				{tabs.map((tab) => (
+					<TabsTrigger key={tab.value} value={tab.value}>
+						{tab.icon}
+						{tab.label}
+					</TabsTrigger>
+				))}
 			</TabsList>
 			{children}
 		</Tabs>

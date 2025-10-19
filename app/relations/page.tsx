@@ -1,7 +1,13 @@
-import { HeroSection } from "@/components/layout/hero-section"
+import { GenericTabSwitcher } from "@/components/layout/generic-tab-switcher"
+import { ManagementPageLayout } from "@/components/layout/management-page-layout"
+import {
+	StatCard,
+	StatGrid,
+	UsageCard,
+	UsageList,
+} from "@/components/layout/statistics-components"
 import { RelationTypesTabContent } from "@/components/relations/relation-types-tab-content"
 import { RelationsPageClient } from "@/components/relations/relations-page-client"
-import { RelationsTabSwitcher } from "@/components/relations/relations-tab-switcher"
 import { TabsContent } from "@/components/ui/tabs"
 import { api } from "@/lib/trpc/server"
 
@@ -42,78 +48,50 @@ export default async function RelationsPage({
 	}
 
 	return (
-		<div className="min-h-screen">
-			<HeroSection
-				badge="Relationship Management"
-				title="Character Relations"
-				description="Define and manage relationships between characters including friends, rivals, mentors, and more"
-			/>
+		<ManagementPageLayout
+			badge="Relationship Management"
+			title="Character Relations"
+			description="Define and manage relationships between characters including friends, rivals, mentors, and more"
+		>
+			<GenericTabSwitcher
+				initialTab={currentTab}
+				tabs={[
+					{ value: "types", label: "Relations" },
+					{ value: "statistics", label: "Statistics" },
+				]}
+			>
+				<RelationsPageClient initialSearch={searchQuery} />
 
-			<section className="container mx-auto px-4 pb-16">
-				<RelationsTabSwitcher initialTab={currentTab}>
-					<RelationsPageClient initialSearch={searchQuery} />
+				{/* Relation Types Tab */}
+				<TabsContent value="types" className="space-y-6">
+					<RelationTypesTabContent relationTypes={filteredRelationTypes} />
+				</TabsContent>
 
-					{/* Relation Types Tab */}
-					<TabsContent value="types" className="space-y-6">
-						<RelationTypesTabContent relationTypes={filteredRelationTypes} />
-					</TabsContent>
+				{/* Statistics Tab */}
+				<TabsContent value="statistics" className="space-y-6">
+					<StatGrid>
+						<StatCard label="Total Relation Types" value={stats.totalTypes} />
+						<StatCard label="Total Relations" value={stats.totalRelations} />
+					</StatGrid>
 
-					{/* Statistics Tab */}
-					<TabsContent value="statistics" className="space-y-6">
-						<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-							<div className="rounded-lg border bg-card p-6">
-								<h3 className="text-sm font-medium text-muted-foreground">
-									Total Relation Types
-								</h3>
-								<p className="mt-2 text-3xl font-bold">{stats.totalTypes}</p>
-							</div>
-							<div className="rounded-lg border bg-card p-6">
-								<h3 className="text-sm font-medium text-muted-foreground">
-									Total Relations
-								</h3>
-								<p className="mt-2 text-3xl font-bold">
-									{stats.totalRelations}
-								</p>
-							</div>
-						</div>
-
-						{/* Most Used Relation Types */}
-						<div className="space-y-4">
-							<h3 className="text-xl font-semibold">
-								Most Used Relation Types
-							</h3>
-							<div className="space-y-2">
-								{stats.mostUsed.map((type) => (
-									<div
-										key={type.id}
-										className="flex items-center justify-between rounded-lg border bg-card p-4"
-									>
-										<div>
-											<h4 className="font-semibold capitalize">{type.name}</h4>
-											{type.description && (
-												<p className="text-sm text-muted-foreground">
-													{type.description}
-												</p>
-											)}
-										</div>
-										<div className="text-right">
-											<p className="text-2xl font-bold">
-												{type._count.relations}
-											</p>
-											<p className="text-xs text-muted-foreground">relations</p>
-										</div>
-									</div>
-								))}
-								{stats.mostUsed.length === 0 && (
-									<p className="text-center text-muted-foreground py-8">
-										No relation types in use yet.
-									</p>
-								)}
-							</div>
-						</div>
-					</TabsContent>
-				</RelationsTabSwitcher>
-			</section>
-		</div>
+					{/* Most Used Relation Types */}
+					<UsageList
+						title="Most Used Relation Types"
+						emptyMessage="No relation types in use yet."
+						showEmpty={stats.mostUsed.length === 0}
+					>
+						{stats.mostUsed.map((type) => (
+							<UsageCard
+								key={type.id}
+								title={type.name}
+								subtitle={type.description || undefined}
+								count={type._count.relations}
+								countLabel="relations"
+							/>
+						))}
+					</UsageList>
+				</TabsContent>
+			</GenericTabSwitcher>
+		</ManagementPageLayout>
 	)
 }
