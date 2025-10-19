@@ -56,6 +56,11 @@ export const characterRouter = createTRPCRouter({
 			const character = await ctx.prisma.character.findUnique({
 				where: { id: input.id },
 				include: {
+					staticTags: {
+						include: {
+							tagDefinition: true,
+						},
+					},
 					tags: {
 						include: {
 							tag: {
@@ -143,6 +148,16 @@ export const characterRouter = createTRPCRouter({
 						}
 					}
 				}
+				staticTags?: {
+					some: {
+						OR?: Array<{
+							AND?: Array<{
+								tagDefinition: { name: string }
+								value?: { gte?: string; lte?: string }
+							}>
+						}>
+					}
+				}
 			} = {}
 
 			if (input.name) {
@@ -162,23 +177,76 @@ export const characterRouter = createTRPCRouter({
 				}
 			}
 
-			// Handle static tags filtering
+			// Handle static tags filtering with proper relational queries
 			if (input.staticTags) {
-				const staticTagsFilter: {
-					path?: string[]
-					gte?: number
-					lte?: number
-				} = {}
+				const staticTagConditions: Array<{
+					AND: Array<{
+						tagDefinition: { name: string }
+						value?: { gte?: string; lte?: string }
+					}>
+				}> = []
+
+				// Height filtering
 				if (
 					input.staticTags.heightMin !== undefined ||
 					input.staticTags.heightMax !== undefined
 				) {
-					staticTagsFilter.path = ["height"]
-					if (input.staticTags.heightMin !== undefined) {
-						staticTagsFilter.gte = input.staticTags.heightMin
+					const heightCondition: {
+						tagDefinition: { name: string }
+						value?: { gte?: string; lte?: string }
+					} = {
+						tagDefinition: { name: "height" },
 					}
-					if (input.staticTags.heightMax !== undefined) {
-						staticTagsFilter.lte = input.staticTags.heightMax
+
+					if (
+						input.staticTags.heightMin !== undefined ||
+						input.staticTags.heightMax !== undefined
+					) {
+						heightCondition.value = {}
+						if (input.staticTags.heightMin !== undefined) {
+							heightCondition.value.gte = input.staticTags.heightMin.toString()
+						}
+						if (input.staticTags.heightMax !== undefined) {
+							heightCondition.value.lte = input.staticTags.heightMax.toString()
+						}
+					}
+
+					staticTagConditions.push({ AND: [heightCondition] })
+				}
+
+				// Weight filtering
+				if (
+					input.staticTags.weightMin !== undefined ||
+					input.staticTags.weightMax !== undefined
+				) {
+					const weightCondition: {
+						tagDefinition: { name: string }
+						value?: { gte?: string; lte?: string }
+					} = {
+						tagDefinition: { name: "weight" },
+					}
+
+					if (
+						input.staticTags.weightMin !== undefined ||
+						input.staticTags.weightMax !== undefined
+					) {
+						weightCondition.value = {}
+						if (input.staticTags.weightMin !== undefined) {
+							weightCondition.value.gte = input.staticTags.weightMin.toString()
+						}
+						if (input.staticTags.weightMax !== undefined) {
+							weightCondition.value.lte = input.staticTags.weightMax.toString()
+						}
+					}
+
+					staticTagConditions.push({ AND: [weightCondition] })
+				}
+
+				if (staticTagConditions.length > 0) {
+					where.staticTags = {
+						some: {
+							OR: staticTagConditions,
+						},
 					}
 				}
 			}
@@ -192,6 +260,11 @@ export const characterRouter = createTRPCRouter({
 						createdAt: "desc",
 					},
 					include: {
+						staticTags: {
+							include: {
+								tagDefinition: true,
+							},
+						},
 						tags: {
 							include: {
 								tag: {
@@ -224,11 +297,54 @@ export const characterRouter = createTRPCRouter({
 	create: protectedProcedure
 		.input(createCharacterSchema)
 		.mutation(async ({ ctx, input }) => {
-			const { tagIds, ...data } = input
+			const { tagIds, staticTags, ...data } = input
+
+			// Prepare static tags for creation
+			const staticTagsData: Array<{
+				tagDefId: string
+				value: string
+			}> = []
+
+			if (staticTags) {
+				// Get static tag definitions to map names to IDs
+				const tagDefinitions = await ctx.prisma.staticTagDefinition.findMany({
+					where: {
+						name: {
+							in: Object.keys(staticTags),
+						},
+					},
+				})
+
+				const tagDefMap = new Map(
+					tagDefinitions.map((def) => [def.name, def.id]),
+				)
+
+				// Convert staticTags object to create format
+				for (const [key, value] of Object.entries(staticTags)) {
+					if (value !== undefined && value !== null) {
+						const tagDefId = tagDefMap.get(key)
+						if (tagDefId) {
+							staticTagsData.push({
+								tagDefId,
+								value:
+									typeof value === "object"
+										? value.toISOString()
+										: String(value),
+							})
+						}
+					}
+				}
+			}
 
 			return await ctx.prisma.character.create({
 				data: {
 					...data,
+					staticTags:
+						staticTagsData.length > 0
+							? {
+									create: staticTagsData,
+								}
+							: undefined,
 					tags: {
 						create: tagIds.map((tagId) => ({
 							tagId,
@@ -236,6 +352,11 @@ export const characterRouter = createTRPCRouter({
 					},
 				},
 				include: {
+					staticTags: {
+						include: {
+							tagDefinition: true,
+						},
+					},
 					tags: {
 						include: {
 							tag: {
@@ -253,7 +374,62 @@ export const characterRouter = createTRPCRouter({
 	update: protectedProcedure
 		.input(updateCharacterSchema)
 		.mutation(async ({ ctx, input }) => {
-			const { id, tagIds, ...data } = input
+			const { id, tagIds, staticTags, ...data } = input
+
+			// Prepare static tags for update
+			let staticTagsUpdate:
+				| {
+						deleteMany?: Record<string, never>
+						create?: Array<{
+							tagDefId: string
+							value: string
+						}>
+				  }
+				| undefined
+
+			if (staticTags !== undefined) {
+				staticTagsUpdate = { deleteMany: {} }
+
+				if (staticTags !== null) {
+					// Get static tag definitions to map names to IDs
+					const tagDefinitions = await ctx.prisma.staticTagDefinition.findMany({
+						where: {
+							name: {
+								in: Object.keys(staticTags),
+							},
+						},
+					})
+
+					const tagDefMap = new Map(
+						tagDefinitions.map((def) => [def.name, def.id]),
+					)
+
+					// Convert staticTags object to create format
+					const staticTagsData: Array<{
+						tagDefId: string
+						value: string
+					}> = []
+
+					for (const [key, value] of Object.entries(staticTags)) {
+						if (value !== undefined && value !== null) {
+							const tagDefId = tagDefMap.get(key)
+							if (tagDefId) {
+								staticTagsData.push({
+									tagDefId,
+									value:
+										typeof value === "object"
+											? value.toISOString()
+											: String(value),
+								})
+							}
+						}
+					}
+
+					if (staticTagsData.length > 0) {
+						staticTagsUpdate.create = staticTagsData
+					}
+				}
+			}
 
 			return await ctx.prisma.character.update({
 				where: { id },
@@ -264,9 +440,7 @@ export const characterRouter = createTRPCRouter({
 						portraitUrl: data.portraitUrl,
 					}),
 					...(data.info !== undefined && { info: data.info }),
-					...(data.staticTags !== undefined && {
-						staticTags: data.staticTags,
-					}),
+					...(staticTagsUpdate && { staticTags: staticTagsUpdate }),
 					...(tagIds !== undefined && {
 						tags: {
 							deleteMany: {},
@@ -277,6 +451,11 @@ export const characterRouter = createTRPCRouter({
 					}),
 				},
 				include: {
+					staticTags: {
+						include: {
+							tagDefinition: true,
+						},
+					},
 					tags: {
 						include: {
 							tag: {

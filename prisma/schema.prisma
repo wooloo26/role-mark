@@ -97,16 +97,17 @@ model Comment {
 // ============================================
 
 model Character {
-  id          String         @id @default(cuid())
+  id          String               @id @default(cuid())
   name        String
   avatarUrl   String?
   portraitUrl String?
-  info        String?        @db.Text // Summary text (Markdown-supported)
-  staticTags  Json? // Structured fields: { height: number, weight: number, birthday: Date }
+  info        String?              @db.Text // Summary text (Markdown-supported)
+  // Static tags are stored in the dedicated StaticTagDefinition model and associated via CharacterStaticTag
+  staticTags  CharacterStaticTag[]
   // dynamic tags are stored in the dedicated Tag model and associated via CharacterTag
   tags        CharacterTag[]
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
 
   // Many-to-many relations
   resources CharacterOnResource[]
@@ -271,6 +272,53 @@ model ResourceTag {
   @@index([resourceId])
   @@index([tagId])
   @@map("resource_tags")
+}
+
+// =============================
+// STATIC TAGS (Character Attributes)
+// =============================
+
+enum StaticTagDataType {
+  STRING
+  NUMBER
+  DATE
+  BOOLEAN
+}
+
+model StaticTagDefinition {
+  id          String            @id @default(cuid())
+  name        String            @unique // e.g., "height", "weight", "birthday"
+  displayName String // e.g., "Height", "Weight", "Birthday"
+  dataType    StaticTagDataType
+  unit        String? // e.g., "cm", "kg" for measurements
+  description String?
+  isRequired  Boolean           @default(false)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  characterStaticTags CharacterStaticTag[]
+
+  @@index([name])
+  @@map("static_tag_definitions")
+}
+
+model CharacterStaticTag {
+  id          String   @id @default(cuid())
+  characterId String
+  tagDefId    String
+  value       String // Stored as string, parsed based on dataType from definition
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  character     Character           @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  tagDefinition StaticTagDefinition @relation(fields: [tagDefId], references: [id], onDelete: Cascade)
+
+  @@unique([characterId, tagDefId])
+  @@index([characterId])
+  @@index([tagDefId])
+  @@index([tagDefId, value]) // Enable efficient filtering by tag definition and value
+  @@index([characterId, tagDefId, value]) // Composite index for character-specific tag queries
+  @@map("character_static_tags")
 }
 
 // ============================================

@@ -129,15 +129,55 @@ async function main() {
 
 	console.log("✅ Created resource tags")
 
+	// Create static tag definitions
+	const heightDef = await prisma.staticTagDefinition.upsert({
+		where: { name: "height" },
+		update: {},
+		create: {
+			name: "height",
+			displayName: "Height",
+			dataType: "NUMBER",
+			unit: "cm",
+			description: "Character height in centimeters",
+		},
+	})
+
+	const weightDef = await prisma.staticTagDefinition.upsert({
+		where: { name: "weight" },
+		update: {},
+		create: {
+			name: "weight",
+			displayName: "Weight",
+			dataType: "NUMBER",
+			unit: "kg",
+			description: "Character weight in kilograms",
+		},
+	})
+
+	const birthdayDef = await prisma.staticTagDefinition.upsert({
+		where: { name: "birthday" },
+		update: {},
+		create: {
+			name: "birthday",
+			displayName: "Birthday",
+			dataType: "DATE",
+			description: "Character's birthday",
+		},
+	})
+
+	console.log("✅ Created static tag definitions")
+
 	// Create sample characters with tags
 	const character1 = await prisma.character.create({
 		data: {
 			name: "Alice",
 			info: "A brave and kind-hearted adventurer.",
 			staticTags: {
-				height: 165,
-				weight: 52,
-				birthday: "2000-03-15",
+				create: [
+					{ tagDefId: heightDef.id, value: "165" },
+					{ tagDefId: weightDef.id, value: "52" },
+					{ tagDefId: birthdayDef.id, value: "2000-03-15" },
+				],
 			},
 			tags: {
 				create: [
@@ -154,9 +194,11 @@ async function main() {
 			name: "Bob",
 			info: "A mysterious mage with ancient knowledge.",
 			staticTags: {
-				height: 178,
-				weight: 68,
-				birthday: "1998-08-22",
+				create: [
+					{ tagDefId: heightDef.id, value: "178" },
+					{ tagDefId: weightDef.id, value: "68" },
+					{ tagDefId: birthdayDef.id, value: "1998-08-22" },
+				],
 			},
 			tags: {
 				create: [
