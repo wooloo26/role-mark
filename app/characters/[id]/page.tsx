@@ -152,7 +152,7 @@ export default function CharacterDetailPage({
 					{/* Avatar */}
 					<Card>
 						<CardContent className="p-6">
-							<div className="aspect-square relative rounded-lg overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10 mb-4">
+							<div className="aspect-square relative rounded-lg overflow-hidden bg-primary mb-4">
 								{character.avatarUrl ? (
 									<Image
 										src={character.avatarUrl}
@@ -247,14 +247,42 @@ export default function CharacterDetailPage({
 							<CardHeader>
 								<CardTitle className="text-lg">Tags</CardTitle>
 							</CardHeader>
-							<CardContent>
-								<div className="flex flex-wrap gap-2">
-									{character.tags.map((ct) => (
-										<Badge key={ct.tag.id} variant="secondary">
-											{ct.tag.name}
-										</Badge>
-									))}
-								</div>
+							<CardContent className="space-y-4">
+								{/* Group tags by group */}
+								{(() => {
+									const tagsByGroup = new Map<
+										string,
+										Array<{ id: string; name: string }>
+									>()
+
+									character.tags.forEach((ct) => {
+										const groupName = ct.tag.group?.name || "Ungrouped"
+										if (!tagsByGroup.has(groupName)) {
+											tagsByGroup.set(groupName, [])
+										}
+										tagsByGroup.get(groupName)?.push({
+											id: ct.tag.id,
+											name: ct.tag.name,
+										})
+									})
+
+									return Array.from(tagsByGroup.entries()).map(
+										([groupName, tags]) => (
+											<div key={groupName}>
+												<h4 className="text-sm font-medium text-muted-foreground mb-2">
+													{groupName}
+												</h4>
+												<div className="flex flex-wrap gap-2">
+													{tags.map((tag) => (
+														<Badge key={tag.id} variant="secondary">
+															{tag.name}
+														</Badge>
+													))}
+												</div>
+											</div>
+										),
+									)
+								})()}
 							</CardContent>
 						</Card>
 					)}

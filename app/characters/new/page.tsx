@@ -1,14 +1,14 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ArrowLeft, Plus, Upload, X } from "lucide-react"
+import { ArrowLeft, Plus, Upload } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import { TagSelector } from "@/components/tag-selector"
 import { AnimatedGradientText } from "@/components/ui/animated-gradient-text"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
 	Card,
@@ -46,7 +46,6 @@ type CharacterFormValues = z.infer<typeof characterFormSchema>
 export default function NewCharacterPage() {
 	const router = useRouter()
 	const [selectedTags, setSelectedTags] = useState<string[]>([])
-	const [newTag, setNewTag] = useState("")
 
 	const form = useForm<CharacterFormValues>({
 		resolver: zodResolver(characterFormSchema),
@@ -94,17 +93,6 @@ export default function NewCharacterPage() {
 		})
 	}
 
-	const handleAddTag = () => {
-		if (newTag && !selectedTags.includes(newTag)) {
-			setSelectedTags([...selectedTags, newTag])
-			setNewTag("")
-		}
-	}
-
-	const handleRemoveTag = (tag: string) => {
-		setSelectedTags(selectedTags.filter((t) => t !== tag))
-	}
-
 	return (
 		<div className="container mx-auto px-4 py-8 max-w-4xl">
 			{/* Header */}
@@ -118,8 +106,6 @@ export default function NewCharacterPage() {
 
 				<div className="text-center space-y-4">
 					<AnimatedGradientText className="inline-flex items-center gap-2">
-						<Plus className="h-4 w-4" />
-						<hr className="mx-2 h-4 w-[1px] shrink-0 bg-gray-300" />
 						<span
 							className={cn(
 								"inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent",
@@ -299,44 +285,16 @@ export default function NewCharacterPage() {
 						<CardHeader>
 							<CardTitle>Tags</CardTitle>
 							<CardDescription>
-								Categorize the character with tags
+								Categorize the character with tags for better organization
 							</CardDescription>
 						</CardHeader>
-						<CardContent className="space-y-4">
-							<div className="flex gap-2">
-								<Input
-									placeholder="Add a tag..."
-									value={newTag}
-									onChange={(e) => setNewTag(e.target.value)}
-									onKeyDown={(e) => {
-										if (e.key === "Enter") {
-											e.preventDefault()
-											handleAddTag()
-										}
-									}}
-								/>
-								<Button type="button" variant="outline" onClick={handleAddTag}>
-									<Plus className="h-4 w-4 mr-2" />
-									Add
-								</Button>
-							</div>
-
-							{selectedTags.length > 0 && (
-								<div className="flex flex-wrap gap-2">
-									{selectedTags.map((tag) => (
-										<Badge key={tag} variant="secondary" className="gap-1">
-											{tag}
-											<button
-												type="button"
-												onClick={() => handleRemoveTag(tag)}
-												className="ml-1 hover:text-destructive"
-											>
-												<X className="h-3 w-3" />
-											</button>
-										</Badge>
-									))}
-								</div>
-							)}
+						<CardContent>
+							<TagSelector
+								scope="CHARACTER"
+								selectedTags={selectedTags}
+								onTagsChange={setSelectedTags}
+								placeholder="Select tags for this character..."
+							/>
 						</CardContent>
 					</Card>
 

@@ -42,7 +42,7 @@ export default function ProfilePage() {
 				)}
 			/>
 			<Card className="border-1 shadow-xl overflow-hidden">
-				<div className="h-32 bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5" />
+				<div className="h-32 bg-primary" />
 				<CardContent className="pt-0 -mt-16">
 					<div className="flex flex-col sm:flex-row items-center sm:items-end gap-6 mb-8">
 						<Avatar className="h-32 w-32 border-4 border-background shadow-xl">
