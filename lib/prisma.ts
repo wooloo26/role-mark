@@ -152,4 +152,4 @@ export const prisma = basePrisma.$extends({
 			},
 		},
 	},
-})
+}) as typeof basePrisma

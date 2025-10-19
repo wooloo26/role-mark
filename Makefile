@@ -57,15 +57,16 @@ setup:
 	@echo ""
 	@echo "Step 1: Installing dependencies..."
 	pnpm install
-	@echo ""
-	@echo "Step 2: Starting PostgreSQL..."
+	@echo "Step 2: Generating Prisma client..."
+	pnpm db:generate
+	@echo "Step 3: Starting PostgreSQL..."
 	docker-compose up -d
 	@timeout /t 5 /nobreak >nul
 	@echo ""
-	@echo "Step 3: Running migrations..."
+	@echo "Step 4: Running migrations..."
 	pnpm db:migrate
 	@echo ""
-	@echo "Step 4: Seeding database..."
+	@echo "Step 5: Seeding database..."
 	pnpm db:seed
 	@echo ""
 	@echo "=== Setup complete! ==="
