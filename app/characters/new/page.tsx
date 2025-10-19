@@ -1,48 +1,22 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ArrowLeft, Plus } from "lucide-react"
-import Link from "next/link"
+import { Plus } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { ImageUploadWithCrop } from "@/components/image-upload-with-crop"
-import { TagSelector } from "@/components/tag-selector"
-import { AnimatedGradientText } from "@/components/ui/animated-gradient-text"
-import { Button } from "@/components/ui/button"
+import { CharacterAttributesForm } from "@/components/characters/character-attributes-form"
+import { CharacterBasicInfoForm } from "@/components/characters/character-basic-info-form"
+import { CharacterFormActions } from "@/components/characters/character-form-actions"
+import { CharacterFormHeader } from "@/components/characters/character-form-header"
+import { CharacterMediaForm } from "@/components/characters/character-media-form"
+import { CharacterTagsForm } from "@/components/characters/character-tags-form"
 import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card"
-import {
-	Form,
-	FormControl,
-	FormDescription,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+	type CharacterFormValues,
+	characterFormSchema,
+} from "@/components/characters/form-schemas"
+import { Form } from "@/components/ui/form"
 import { trpc } from "@/lib/trpc/client"
-import { cn } from "@/lib/utils"
-
-const characterFormSchema = z.object({
-	name: z.string().min(1, "Name is required").max(255),
-	avatarUrl: z.url().optional().or(z.literal("")),
-	portraitUrl: z.url().optional().or(z.literal("")),
-	info: z.string().optional(),
-	height: z.string().optional(),
-	weight: z.string().optional(),
-	birthday: z.string().optional(),
-})
-
-type CharacterFormValues = z.infer<typeof characterFormSchema>
 
 export default function NewCharacterPage() {
 	const router = useRouter()
@@ -96,238 +70,30 @@ export default function NewCharacterPage() {
 
 	return (
 		<div className="container mx-auto px-4 py-8 max-w-4xl">
-			{/* Header */}
-			<div className="mb-8">
-				<Button variant="ghost" asChild className="mb-4">
-					<Link href="/characters">
-						<ArrowLeft className="h-4 w-4 mr-2" />
-						Back to Characters
-					</Link>
-				</Button>
+			<CharacterFormHeader
+				backUrl="/characters"
+				backLabel="Back to Characters"
+				gradientText="New Character"
+				title="Create Character"
+				description="Fill in the details below to create a new character"
+			/>
 
-				<div className="text-center space-y-4">
-					<AnimatedGradientText className="inline-flex items-center gap-2">
-						<span
-							className={cn(
-								"inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent",
-							)}
-						>
-							New Character
-						</span>
-					</AnimatedGradientText>
-					<h1 className="text-3xl font-bold">Create Character</h1>
-					<p className="text-muted-foreground">
-						Fill in the details below to create a new character
-					</p>
-				</div>
-			</div>
-
-			{/* Form */}
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-					{/* Basic Information */}
-					<Card>
-						<CardHeader>
-							<CardTitle>Basic Information</CardTitle>
-							<CardDescription>
-								Essential details about the character
-							</CardDescription>
-						</CardHeader>
-						<CardContent className="space-y-4">
-							<FormField
-								control={form.control}
-								name="name"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Name *</FormLabel>
-										<FormControl>
-											<Input placeholder="Character name" {...field} />
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-
-							<FormField
-								control={form.control}
-								name="info"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Description</FormLabel>
-										<FormControl>
-											<Textarea
-												placeholder="Brief description of the character..."
-												className="min-h-[120px]"
-												{...field}
-											/>
-										</FormControl>
-										<FormDescription>
-											Markdown formatting is supported
-										</FormDescription>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-						</CardContent>
-					</Card>
-
-					{/* Media */}
-					<Card>
-						<CardHeader>
-							<CardTitle>Media</CardTitle>
-							<CardDescription>Character images and avatars</CardDescription>
-						</CardHeader>
-						<CardContent className="space-y-4">
-							<FormField
-								control={form.control}
-								name="avatarUrl"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Avatar</FormLabel>
-										<FormControl>
-											<ImageUploadWithCrop
-												value={field.value}
-												onChange={field.onChange}
-												aspectRatio={1}
-												previewClassName="w-24 h-24"
-												label="Upload Avatar"
-											/>
-										</FormControl>
-										<FormDescription>Square image recommended</FormDescription>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-
-							<FormField
-								control={form.control}
-								name="portraitUrl"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Portrait</FormLabel>
-										<FormControl>
-											<ImageUploadWithCrop
-												value={field.value}
-												onChange={field.onChange}
-												previewClassName="w-32 h-40"
-												label="Upload Portrait"
-											/>
-										</FormControl>
-										<FormDescription>
-											Full body or portrait image (3:4 ratio recommended)
-										</FormDescription>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-						</CardContent>
-					</Card>
-
-					{/* Static Attributes */}
-					<Card>
-						<CardHeader>
-							<CardTitle>Attributes</CardTitle>
-							<CardDescription>Static character attributes</CardDescription>
-						</CardHeader>
-						<CardContent className="space-y-4">
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-								<FormField
-									control={form.control}
-									name="height"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Height (cm)</FormLabel>
-											<FormControl>
-												<Input type="number" placeholder="170" {...field} />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name="weight"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Weight (kg)</FormLabel>
-											<FormControl>
-												<Input type="number" placeholder="65" {...field} />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</div>
-
-							<FormField
-								control={form.control}
-								name="birthday"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Birthday</FormLabel>
-										<FormControl>
-											<Input type="date" {...field} />
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-						</CardContent>
-					</Card>
-
-					{/* Tags */}
-					<Card>
-						<CardHeader>
-							<CardTitle>Tags</CardTitle>
-							<CardDescription>
-								Categorize the character with tags for better organization
-							</CardDescription>
-						</CardHeader>
-						<CardContent>
-							<TagSelector
-								scope="CHARACTER"
-								selectedTags={selectedTags}
-								onTagsChange={setSelectedTags}
-								placeholder="Select tags for this character..."
-							/>
-						</CardContent>
-					</Card>
-
-					{/* Submit */}
-					<div className="flex gap-4 justify-end">
-						<Button
-							type="button"
-							variant="outline"
-							onClick={() => router.back()}
-						>
-							Cancel
-						</Button>
-						<Button
-							type="submit"
-							disabled={createMutation.isPending}
-							className="gap-2"
-						>
-							{createMutation.isPending ? (
-								"Creating..."
-							) : (
-								<>
-									<Plus className="h-4 w-4" />
-									Create Character
-								</>
-							)}
-						</Button>
-					</div>
-
-					{createMutation.error && (
-						<Card className="border-destructive">
-							<CardContent className="pt-6">
-								<p className="text-sm text-destructive">
-									Error: {createMutation.error.message}
-								</p>
-							</CardContent>
-						</Card>
-					)}
+					<CharacterBasicInfoForm control={form.control} />
+					<CharacterMediaForm control={form.control} />
+					<CharacterAttributesForm control={form.control} />
+					<CharacterTagsForm
+						selectedTags={selectedTags}
+						onTagsChange={setSelectedTags}
+					/>
+					<CharacterFormActions
+						isSubmitting={createMutation.isPending}
+						submitLabel="Create Character"
+						submittingLabel="Creating..."
+						icon={Plus}
+						error={createMutation.error?.message}
+					/>
 				</form>
 			</Form>
 		</div>

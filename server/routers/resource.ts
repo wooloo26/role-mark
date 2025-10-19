@@ -142,8 +142,24 @@ export const resourceRouter = createTRPCRouter({
 	search: publicProcedure
 		.input(resourceSearchSchema)
 		.query(async ({ ctx, input }) => {
-			// biome-ignore lint/suspicious/noExplicitAny: Dynamic where clause construction
-			const where: any = {}
+			const where: {
+				title?: { contains: string; mode: "insensitive" }
+				type?: ResourceType
+				contentType?: ContentType
+				uploaderId?: string
+				tags?: {
+					some: {
+						tagId: {
+							in: string[]
+						}
+					}
+				}
+				characters?: {
+					some: {
+						characterId: string
+					}
+				}
+			} = {}
 
 			if (input.title) {
 				where.title = {
