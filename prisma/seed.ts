@@ -1,4 +1,9 @@
-import { PrismaClient, TagScope } from "@prisma/client"
+import {
+	ContentType,
+	PrismaClient,
+	ResourceType,
+	TagScope,
+} from "@prisma/client"
 import bcrypt from "bcryptjs"
 
 const prisma = new PrismaClient()
@@ -304,8 +309,8 @@ async function main() {
 		data: {
 			title: "Character Portrait Collection",
 			description: "A collection of character portraits",
-			type: "FILE_ARRAY",
-			contentType: "IMAGE",
+			type: ResourceType.FILE_ARRAY,
+			contentType: ContentType.IMAGE,
 			thumbnailUrl: "/uploads/portraits/collection-1-thumb.jpg",
 			uploaderId: user.id,
 			files: {
@@ -347,8 +352,8 @@ async function main() {
 		data: {
 			title: "Character Animation Demo",
 			description: "Animated showcase of character",
-			type: "SINGLE_FILE",
-			contentType: "VIDEO",
+			type: ResourceType.SINGLE_FILE,
+			contentType: ContentType.VIDEO,
 			thumbnailUrl: "/uploads/videos/demo-thumb.jpg",
 			uploaderId: user.id,
 			files: {
@@ -380,7 +385,7 @@ async function main() {
 		data: {
 			title: "Live2D Character Model",
 			description: "Complete Live2D model with all dependencies",
-			type: "FOLDER",
+			type: ResourceType.FOLDER,
 			contentType: null,
 			thumbnailUrl: "/uploads/models/live2d-thumb.jpg",
 			uploaderId: user.id,
