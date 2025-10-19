@@ -104,8 +104,8 @@ export default async function CharacterDetailPage({
 
 						<TabsContent value="relations">
 							<CharacterRelationsTab
-								relationsFrom={character.relationsFrom}
-								relationsTo={character.relationsTo}
+								characterId={character.id}
+								isOwner={true} // TODO: Check if user is owner/authenticated
 							/>
 						</TabsContent>
 
