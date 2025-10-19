@@ -146,13 +146,13 @@ export default function CharacterDetailPage({
 			</div>
 
 			{/* Main Content */}
-			<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+			<div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
 				{/* Left Column - Images & Quick Info */}
 				<div className="lg:col-span-1 space-y-6">
 					{/* Avatar */}
 					<Card>
-						<CardContent className="p-6">
-							<div className="aspect-square relative rounded-lg overflow-hidden bg-primary mb-4">
+						<CardContent className="p-4">
+							<div className="aspect-square relative rounded-xl overflow-hidden mb-3 max-w-[220px] mx-auto">
 								{character.avatarUrl ? (
 									<Image
 										src={character.avatarUrl}
@@ -162,15 +162,15 @@ export default function CharacterDetailPage({
 									/>
 								) : (
 									<div className="w-full h-full flex items-center justify-center">
-										<Avatar className="h-32 w-32">
-											<AvatarFallback className="text-6xl">
+										<Avatar className="h-20 w-20">
+											<AvatarFallback className="text-4xl">
 												{character.name.charAt(0).toUpperCase()}
 											</AvatarFallback>
 										</Avatar>
 									</div>
 								)}
 							</div>
-							<h1 className="text-2xl font-bold text-center">
+							<h1 className="text-xl font-bold text-center">
 								{character.name}
 							</h1>
 						</CardContent>
@@ -179,11 +179,11 @@ export default function CharacterDetailPage({
 					{/* Portrait */}
 					{character.portraitUrl && (
 						<Card>
-							<CardHeader>
-								<CardTitle className="text-lg">Portrait</CardTitle>
+							<CardHeader className="pb-3">
+								<CardTitle className="text-base">Portrait</CardTitle>
 							</CardHeader>
-							<CardContent>
-								<div className="aspect-[3/4] relative rounded-lg overflow-hidden">
+							<CardContent className="pt-0">
+								<div className="aspect-[2/3] relative rounded-lg overflow-hidden mx-auto">
 									<Image
 										src={character.portraitUrl}
 										alt={`${character.name} portrait`}
@@ -194,119 +194,120 @@ export default function CharacterDetailPage({
 							</CardContent>
 						</Card>
 					)}
-
-					{/* Static Tags */}
-					{character.staticTags && character.staticTags.length > 0 && (
-						<Card>
-							<CardHeader>
-								<CardTitle className="text-lg">Attributes</CardTitle>
-							</CardHeader>
-							<CardContent className="space-y-3">
-								{staticTagsMap.get("height") && (
-									<div className="flex items-center justify-between">
-										<div className="flex items-center gap-2 text-muted-foreground">
-											<Ruler className="h-4 w-4" />
-											<span>Height</span>
-										</div>
-										<span className="font-medium">
-											{staticTagsMap.get("height")} cm
-										</span>
-									</div>
-								)}
-								{staticTagsMap.get("weight") && (
-									<div className="flex items-center justify-between">
-										<div className="flex items-center gap-2 text-muted-foreground">
-											<Weight className="h-4 w-4" />
-											<span>Weight</span>
-										</div>
-										<span className="font-medium">
-											{staticTagsMap.get("weight")} kg
-										</span>
-									</div>
-								)}
-								{staticTagsMap.get("birthday") && (
-									<div className="flex items-center justify-between">
-										<div className="flex items-center gap-2 text-muted-foreground">
-											<Calendar className="h-4 w-4" />
-											<span>Birthday</span>
-										</div>
-										<span className="font-medium">
-											{new Date(
-												staticTagsMap.get("birthday")!,
-											).toLocaleDateString()}
-										</span>
-									</div>
-								)}
-							</CardContent>
-						</Card>
-					)}
-
-					{/* Tags */}
-					{character.tags && character.tags.length > 0 && (
-						<Card>
-							<CardHeader>
-								<CardTitle className="text-lg">Tags</CardTitle>
-							</CardHeader>
-							<CardContent className="space-y-4">
-								{/* Group tags by group */}
-								{(() => {
-									const tagsByGroup = new Map<
-										string,
-										Array<{ id: string; name: string }>
-									>()
-
-									character.tags.forEach((ct) => {
-										const groupName = ct.tag.group?.name || "Ungrouped"
-										if (!tagsByGroup.has(groupName)) {
-											tagsByGroup.set(groupName, [])
-										}
-										tagsByGroup.get(groupName)?.push({
-											id: ct.tag.id,
-											name: ct.tag.name,
-										})
-									})
-
-									return Array.from(tagsByGroup.entries()).map(
-										([groupName, tags]) => (
-											<div key={groupName}>
-												<h4 className="text-sm font-medium text-muted-foreground mb-2">
-													{groupName}
-												</h4>
-												<div className="flex flex-wrap gap-2">
-													{tags.map((tag) => (
-														<Badge key={tag.id} variant="secondary">
-															{tag.name}
-														</Badge>
-													))}
-												</div>
-											</div>
-										),
-									)
-								})()}
-							</CardContent>
-						</Card>
-					)}
 				</div>
 
 				{/* Right Column - Details & Content */}
-				<div className="lg:col-span-2 space-y-6">
-					{/* Description */}
-					{character.info && (
-						<Card>
-							<CardHeader>
-								<CardTitle>About</CardTitle>
-							</CardHeader>
-							<CardContent>
-								<p className="text-muted-foreground whitespace-pre-wrap">
-									{character.info}
-								</p>
-							</CardContent>
-						</Card>
-					)}
+				<div className="lg:col-span-3 space-y-4">
+					{/* Description & Attributes Combined */}
+					<Card>
+						<CardContent className="p-4">
+							{/* About Section */}
+							{character.info && (
+								<div className="mb-4">
+									<h3 className="text-lg font-semibold mb-2">About</h3>
+									<p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+										{character.info}
+									</p>
+								</div>
+							)}
+
+							{/* Static Tags - Compact Grid Layout */}
+							{character.staticTags && character.staticTags.length > 0 && (
+								<div className="border-t pt-4">
+									<h3 className="text-lg font-semibold mb-3">Attributes</h3>
+									<div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-2">
+										{staticTagsMap.get("height") && (
+											<div className="flex items-center gap-2">
+												<Ruler className="h-3.5 w-3.5 text-muted-foreground" />
+												<span className="text-sm text-muted-foreground">
+													Height:
+												</span>
+												<span className="text-sm font-medium">
+													{staticTagsMap.get("height")} cm
+												</span>
+											</div>
+										)}
+										{staticTagsMap.get("weight") && (
+											<div className="flex items-center gap-2">
+												<Weight className="h-3.5 w-3.5 text-muted-foreground" />
+												<span className="text-sm text-muted-foreground">
+													Weight:
+												</span>
+												<span className="text-sm font-medium">
+													{staticTagsMap.get("weight")} kg
+												</span>
+											</div>
+										)}
+										{staticTagsMap.get("birthday") && (
+											<div className="flex items-center gap-2">
+												<Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+												<span className="text-sm text-muted-foreground">
+													Birthday:
+												</span>
+												<span className="text-sm font-medium">
+													{new Date(
+														staticTagsMap.get("birthday")!,
+													).toLocaleDateString()}
+												</span>
+											</div>
+										)}
+									</div>
+								</div>
+							)}
+
+							{/* Tags Section */}
+							{character.tags && character.tags.length > 0 && (
+								<div className="border-t pt-4 mt-4">
+									<h3 className="text-lg font-semibold mb-3">Tags</h3>
+									<div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+										{/* Group tags by group */}
+										{(() => {
+											const tagsByGroup = new Map<
+												string,
+												Array<{ id: string; name: string }>
+											>()
+
+											character.tags.forEach((ct) => {
+												const groupName = ct.tag.group?.name || "Ungrouped"
+												if (!tagsByGroup.has(groupName)) {
+													tagsByGroup.set(groupName, [])
+												}
+												tagsByGroup.get(groupName)?.push({
+													id: ct.tag.id,
+													name: ct.tag.name,
+												})
+											})
+
+											return Array.from(tagsByGroup.entries()).map(
+												([groupName, tags]) => (
+													<div key={groupName} className="flex items-start">
+														<h4 className="text-sm font-medium text-muted-foreground mr-2 shrink-0">
+															{groupName}:
+														</h4>
+														<div className="flex flex-wrap gap-2 flex-1">
+															{tags.map((tag) => (
+																<Badge
+																	key={tag.id}
+																	variant="secondary"
+																	className="text-xs"
+																>
+																	{tag.name}
+																</Badge>
+															))}
+														</div>
+													</div>
+												),
+											)
+										})()}
+									</div>
+								</div>
+							)}
+						</CardContent>
+					</Card>
 
 					{/* Tabs */}
 					<Tabs defaultValue="resources" className="w-full">
-						<TabsList className="grid w-full grid-cols-4">
+						<TabsList className="grid w-full grid-cols-4 mb-2">
 							<TabsTrigger value="resources" className="gap-2">
 								<ImageIcon className="h-4 w-4" />
 								Resources

@@ -24,7 +24,6 @@ interface ImageCropDialogProps {
 	imageSrc: string
 	onCropComplete: (croppedImageBlob: Blob) => void
 	aspectRatio?: number
-	cropShape?: "rect" | "round"
 	title?: string
 	description?: string
 }
@@ -95,18 +94,30 @@ async function getCroppedImg(
 function centerAspectCrop(
 	mediaWidth: number,
 	mediaHeight: number,
-	aspect: number,
+	aspect?: number,
 ): Crop {
-	return centerCrop(
-		makeAspectCrop(
-			{
-				unit: "%",
-				width: 90,
-			},
-			aspect,
+	if (aspect) {
+		return centerCrop(
+			makeAspectCrop(
+				{
+					unit: "%",
+					width: 90,
+				},
+				aspect,
+				mediaWidth,
+				mediaHeight,
+			),
 			mediaWidth,
 			mediaHeight,
-		),
+		)
+	}
+	// Free-form crop without aspect ratio constraint
+	return centerCrop(
+		{
+			unit: "%",
+			width: 90,
+			height: 90,
+		},
 		mediaWidth,
 		mediaHeight,
 	)
@@ -117,8 +128,7 @@ export function ImageCropDialog({
 	onOpenChange,
 	imageSrc,
 	onCropComplete,
-	aspectRatio = 1,
-	cropShape = "rect",
+	aspectRatio,
 	title = "Crop Image",
 	description = "Adjust the crop area to select the desired portion of the image",
 }: ImageCropDialogProps) {
@@ -140,7 +150,6 @@ export function ImageCropDialog({
 			const croppedImageBlob = await getCroppedImg(
 				imgRef.current,
 				completedCrop,
-				cropShape === "round",
 			)
 			onCropComplete(croppedImageBlob)
 			onOpenChange(false)
@@ -167,7 +176,6 @@ export function ImageCropDialog({
 							onChange={(c: Crop) => setCrop(c)}
 							onComplete={(c: PixelCrop) => setCompletedCrop(c)}
 							aspect={aspectRatio}
-							circularCrop={cropShape === "round"}
 						>
 							{/* biome-ignore lint/performance/noImgElement: react-image-crop requires native img element */}
 							<img

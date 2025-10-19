@@ -52,6 +52,7 @@ export default function CharacterEditPage({ params }: CharacterEditPageProps) {
 	const { id } = use(params)
 	const router = useRouter()
 	const [selectedTags, setSelectedTags] = useState<string[]>([])
+	const utils = trpc.useUtils()
 
 	const { data: character, isLoading } = trpc.character.getById.useQuery({ id })
 
@@ -93,7 +94,9 @@ export default function CharacterEditPage({ params }: CharacterEditPageProps) {
 	}, [character, form])
 
 	const updateMutation = trpc.character.update.useMutation({
-		onSuccess: (data) => {
+		onSuccess: async (data) => {
+			// Invalidate and refetch character data
+			await utils.character.getById.invalidate({ id })
 			router.push(`/characters/${data.id}`)
 		},
 	})
@@ -249,7 +252,6 @@ export default function CharacterEditPage({ params }: CharacterEditPageProps) {
 												value={field.value}
 												onChange={field.onChange}
 												aspectRatio={1}
-												cropShape="round"
 												previewClassName="w-24 h-24"
 												label="Upload Avatar"
 											/>
@@ -270,8 +272,6 @@ export default function CharacterEditPage({ params }: CharacterEditPageProps) {
 											<ImageUploadWithCrop
 												value={field.value}
 												onChange={field.onChange}
-												aspectRatio={3 / 4}
-												cropShape="rect"
 												previewClassName="w-32 h-40"
 												label="Upload Portrait"
 											/>

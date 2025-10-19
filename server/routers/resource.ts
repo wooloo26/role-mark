@@ -66,7 +66,7 @@ const updateResourceSchema = z.object({
 	id: z.string(),
 	title: z.string().min(1).max(255).optional(),
 	description: z.string().optional(),
-	thumbnailUrl: z.string().url().optional(),
+	thumbnailUrl: z.url().optional(),
 	tagIds: z.array(z.string()).optional(),
 	characterIds: z.array(z.string()).optional(),
 	// Note: type, contentType, and files cannot be updated to maintain data integrity
@@ -74,8 +74,8 @@ const updateResourceSchema = z.object({
 
 const resourceSearchSchema = z.object({
 	title: z.string().optional(),
-	type: z.nativeEnum(ResourceType).optional(),
-	contentType: z.nativeEnum(ContentType).optional(),
+	type: z.enum(ResourceType).optional(),
+	contentType: z.enum(ContentType).optional(),
 	tagIds: z.array(z.string()).optional(),
 	characterId: z.string().optional(),
 	uploaderId: z.string().optional(),

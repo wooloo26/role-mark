@@ -189,7 +189,6 @@ export default function NewCharacterPage() {
 												value={field.value}
 												onChange={field.onChange}
 												aspectRatio={1}
-												cropShape="round"
 												previewClassName="w-24 h-24"
 												label="Upload Avatar"
 											/>
@@ -210,8 +209,6 @@ export default function NewCharacterPage() {
 											<ImageUploadWithCrop
 												value={field.value}
 												onChange={field.onChange}
-												aspectRatio={3 / 4}
-												cropShape="rect"
 												previewClassName="w-32 h-40"
 												label="Upload Portrait"
 											/>

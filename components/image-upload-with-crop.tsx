@@ -10,7 +10,6 @@ interface ImageUploadWithCropProps {
 	value?: string
 	onChange: (value: string) => void
 	aspectRatio?: number
-	cropShape?: "rect" | "round"
 	previewClassName?: string
 	label?: string
 }
@@ -18,8 +17,7 @@ interface ImageUploadWithCropProps {
 export function ImageUploadWithCrop({
 	value,
 	onChange,
-	aspectRatio = 1,
-	cropShape = "rect",
+	aspectRatio,
 	previewClassName = "w-32 h-32",
 	label = "Upload Image",
 }: ImageUploadWithCropProps) {
@@ -125,7 +123,6 @@ export function ImageUploadWithCrop({
 					imageSrc={imageToCrop}
 					onCropComplete={handleCropComplete}
 					aspectRatio={aspectRatio}
-					cropShape={cropShape}
 				/>
 			)}
 		</div>
