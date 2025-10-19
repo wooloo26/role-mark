@@ -46,7 +46,6 @@ export default function Home() {
 				{/* Hero Content */}
 				<div className="relative z-10 space-y-8">
 					<AnimatedGradientText className="inline-flex items-center gap-2 mb-4">
-						✨ <hr className="mx-2 h-4 w-[1px] shrink-0 bg-gray-300" />{" "}
 						<span
 							className={cn(
 								"inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent",
