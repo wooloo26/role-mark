@@ -91,7 +91,7 @@ export default function SettingsPage() {
 
 	if (status === "loading") {
 		return (
-			<div className="container flex items-center justify-center min-h-[calc(100vh-200px)]">
+			<div className="flex items-center justify-center min-h-[calc(100vh-500px)]">
 				<Loader2 className="h-8 w-8 animate-spin text-primary" />
 			</div>
 		)
