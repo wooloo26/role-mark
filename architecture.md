@@ -35,8 +35,8 @@
 - **Media uploads**: Avatar and portrait images
 - **Tagging system**:
   - **Static tags**: Fixed fields (e.g., height, weight, birthday), supporting sorting, filtering, and statistical charts
-  - **Dynamic tags**: User-defined keyword tags (e.g., “tsundere”, “long black hair”) for search and aggregation
-- **Character relationships**: Define relationships between characters (e.g., “siblings”, “rivals”), supporting unidirectional or bidirectional links
+  - **Dynamic tags**: Shared tags stored in dedicated `Tag` and `TagGroup` models (see Dynamic Tag System below)
+- **Character relationships**: Define relationships between characters (e.g., "siblings", "rivals"), supporting unidirectional or bidirectional links
 - **Search**: Full-text search + tag filtering + range queries on static fields
 
 ### 4. Resource Library
@@ -44,7 +44,7 @@
 - **Supported types**: Images, videos, audio, and other media files
 - **CRUD + upload functionality**
 - **Many-to-many association with characters** (one resource can link to multiple characters; one character can have multiple resources)
-- **Dynamic tag indexing**: For fast retrieval and categorization
+- **Dynamic tag indexing**: Tags are stored in dedicated `Tag` model for fast retrieval and categorization (see Dynamic Tag System below)
 - **Search**: Filter by tags, associated characters, file type, etc.
 
 ### 5. Wiki System
@@ -54,8 +54,6 @@
 - **Many-to-many association with characters**
 - **Version history**: Manual version snapshots; users can view historical content
 - **Search**: Keyword search in content + associated characters + tags
-
----
 
 ## Data Model Constraints
 
@@ -68,22 +66,20 @@
 
 > ⚠️ Comments are only associated with characters; commenting on resources or Wiki pages is not supported at this time.
 
----
-
 ### Public Data
 
 #### **Character**
 
 - `id`, `name`, `avatarUrl`, `portraitUrl`
 - `staticTags`: JSON or structured fields (e.g., `{ height: number, weight: number, birthday: Date }`)
-- `dynamicTags`: `string[]`
+- `tags`: Many-to-many relation to `Tag` via `CharacterTag` join table
 - `relations`: Self-referencing many-to-many relationship with relationship type descriptor
 - `info`: Summary text (Markdown-supported)
 
 #### **Resource**
 
 - `id`, `title`, `fileUrl`, `mimeType`, `uploaderId` (optional)
-- `dynamicTags`: `string[]`
+- `tags`: Many-to-many relation to `Tag` via `ResourceTag` join table
 - Many-to-many association with `Character`
 
 #### **WikiPage**

@@ -103,7 +103,8 @@ model Character {
   portraitUrl String?
   info        String?  @db.Text // Summary text (Markdown-supported)
   staticTags  Json?    // Structured fields: { height: number, weight: number, birthday: Date }
-  dynamicTags String[] // User-defined keyword tags
+  // dynamic tags are stored in the dedicated Tag model and associated via CharacterTag
+  tags        CharacterTag[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -117,7 +118,6 @@ model Character {
   relationsTo      CharacterRelation[]   @relation("CharacterTo")
 
   @@index([name])
-  @@index([dynamicTags])
   @@map("characters")
 }
 
@@ -144,7 +144,8 @@ model Resource {
   fileUrl     String
   mimeType    String
   uploaderId  String?
-  dynamicTags String[] // User-defined keyword tags
+  // dynamic tags are stored in the dedicated Tag model and associated via ResourceTag
+  tags        ResourceTag[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -153,7 +154,6 @@ model Resource {
 
   @@index([title])
   @@index([mimeType])
-  @@index([dynamicTags])
   @@index([uploaderId])
   @@map("resources")
 }
@@ -189,6 +189,73 @@ model WikiPageVersion {
   @@unique([wikiPageId, version])
   @@index([wikiPageId])
   @@map("wiki_page_versions")
+}
+
+// =============================
+// DYNAMIC TAGS (Shared / Public)
+// =============================
+
+enum TagScope {
+  CHARACTER
+  RESOURCE
+}
+
+model TagGroup {
+  id        String   @id @default(cuid())
+  name      String
+  scope     TagScope
+  tags      Tag[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([name])
+  @@index([scope])
+  @@map("tag_groups")
+}
+
+model Tag {
+  id            String   @id @default(cuid())
+  name          String
+  slug          String   @unique
+  groupId       String?
+  scope         TagScope
+  group         TagGroup?       @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  characterTags CharacterTag[]
+  resourceTags  ResourceTag[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([name])
+  @@index([scope])
+  @@map("tags")
+}
+
+model CharacterTag {
+  characterId String
+  tagId       String
+  assignedAt  DateTime @default(now())
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  tag       Tag       @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([characterId, tagId])
+  @@index([characterId])
+  @@index([tagId])
+  @@map("character_tags")
+}
+
+model ResourceTag {
+  resourceId String
+  tagId      String
+  assignedAt DateTime @default(now())
+
+  resource Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  tag      Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([resourceId, tagId])
+  @@index([resourceId])
+  @@index([tagId])
+  @@map("resource_tags")
 }
 
 // ============================================

@@ -19,7 +19,7 @@ const createCharacterSchema = z.object({
 			birthday: z.string().or(z.date()).optional(),
 		})
 		.optional(),
-	dynamicTags: z.array(z.string()).default([]),
+	tagIds: z.array(z.string()).default([]),
 })
 
 const updateCharacterSchema = createCharacterSchema.partial().extend({
@@ -28,7 +28,7 @@ const updateCharacterSchema = createCharacterSchema.partial().extend({
 
 const characterSearchSchema = z.object({
 	name: z.string().optional(),
-	dynamicTags: z.array(z.string()).optional(),
+	tagIds: z.array(z.string()).optional(),
 	staticTags: z
 		.object({
 			heightMin: z.number().optional(),
@@ -56,6 +56,15 @@ export const characterRouter = createTRPCRouter({
 			const character = await ctx.prisma.character.findUnique({
 				where: { id: input.id },
 				include: {
+					tags: {
+						include: {
+							tag: {
+								include: {
+									group: true,
+								},
+							},
+						},
+					},
 					resources: {
 						include: {
 							resource: true,
@@ -125,8 +134,12 @@ export const characterRouter = createTRPCRouter({
 					contains: string
 					mode: "insensitive"
 				}
-				dynamicTags?: {
-					hasEvery: string[]
+				tags?: {
+					some: {
+						tagId: {
+							in: string[]
+						}
+					}
 				}
 			} = {}
 
@@ -137,9 +150,13 @@ export const characterRouter = createTRPCRouter({
 				}
 			}
 
-			if (input.dynamicTags && input.dynamicTags.length > 0) {
-				where.dynamicTags = {
-					hasEvery: input.dynamicTags,
+			if (input.tagIds && input.tagIds.length > 0) {
+				where.tags = {
+					some: {
+						tagId: {
+							in: input.tagIds,
+						},
+					},
 				}
 			}
 
@@ -173,6 +190,15 @@ export const characterRouter = createTRPCRouter({
 						createdAt: "desc",
 					},
 					include: {
+						tags: {
+							include: {
+								tag: {
+									include: {
+										group: true,
+									},
+								},
+							},
+						},
 						_count: {
 							select: {
 								resources: true,
@@ -196,14 +222,27 @@ export const characterRouter = createTRPCRouter({
 	create: protectedProcedure
 		.input(createCharacterSchema)
 		.mutation(async ({ ctx, input }) => {
+			const { tagIds, ...data } = input
+
 			return await ctx.prisma.character.create({
 				data: {
-					name: input.name,
-					avatarUrl: input.avatarUrl,
-					portraitUrl: input.portraitUrl,
-					info: input.info,
-					staticTags: input.staticTags,
-					dynamicTags: input.dynamicTags,
+					...data,
+					tags: {
+						create: tagIds.map((tagId) => ({
+							tagId,
+						})),
+					},
+				},
+				include: {
+					tags: {
+						include: {
+							tag: {
+								include: {
+									group: true,
+								},
+							},
+						},
+					},
 				},
 			})
 		}),
@@ -212,7 +251,7 @@ export const characterRouter = createTRPCRouter({
 	update: protectedProcedure
 		.input(updateCharacterSchema)
 		.mutation(async ({ ctx, input }) => {
-			const { id, ...data } = input
+			const { id, tagIds, ...data } = input
 
 			return await ctx.prisma.character.update({
 				where: { id },
@@ -226,9 +265,25 @@ export const characterRouter = createTRPCRouter({
 					...(data.staticTags !== undefined && {
 						staticTags: data.staticTags,
 					}),
-					...(data.dynamicTags !== undefined && {
-						dynamicTags: data.dynamicTags,
+					...(tagIds !== undefined && {
+						tags: {
+							deleteMany: {},
+							create: tagIds.map((tagId) => ({
+								tagId,
+							})),
+						},
 					}),
+				},
+				include: {
+					tags: {
+						include: {
+							tag: {
+								include: {
+									group: true,
+								},
+							},
+						},
+					},
 				},
 			})
 		}),

@@ -10,20 +10,20 @@ const createResourceSchema = z.object({
 	title: z.string().min(1).max(255),
 	fileUrl: z.url(),
 	mimeType: z.string(),
-	dynamicTags: z.array(z.string()).default([]),
+	tagIds: z.array(z.string()).default([]),
 	characterIds: z.array(z.string()).default([]),
 })
 
 const updateResourceSchema = z.object({
 	id: z.string(),
 	title: z.string().min(1).max(255).optional(),
-	dynamicTags: z.array(z.string()).optional(),
+	tagIds: z.array(z.string()).optional(),
 	characterIds: z.array(z.string()).optional(),
 })
 
 const resourceSearchSchema = z.object({
 	title: z.string().optional(),
-	dynamicTags: z.array(z.string()).optional(),
+	tagIds: z.array(z.string()).optional(),
 	mimeType: z.string().optional(),
 	characterId: z.string().optional(),
 	limit: z.number().min(1).max(100).default(20),
@@ -43,6 +43,15 @@ export const resourceRouter = createTRPCRouter({
 							id: true,
 							name: true,
 							image: true,
+						},
+					},
+					tags: {
+						include: {
+							tag: {
+								include: {
+									group: true,
+								},
+							},
 						},
 					},
 					characters: {
@@ -75,7 +84,13 @@ export const resourceRouter = createTRPCRouter({
 		.query(async ({ ctx, input }) => {
 			const where: {
 				title?: { contains: string; mode: "insensitive" }
-				dynamicTags?: { hasEvery: string[] }
+				tags?: {
+					some: {
+						tagId: {
+							in: string[]
+						}
+					}
+				}
 				mimeType?: { contains: string }
 				characters?: { some: { characterId: string } }
 			} = {}
@@ -87,9 +102,13 @@ export const resourceRouter = createTRPCRouter({
 				}
 			}
 
-			if (input.dynamicTags && input.dynamicTags.length > 0) {
-				where.dynamicTags = {
-					hasEvery: input.dynamicTags,
+			if (input.tagIds && input.tagIds.length > 0) {
+				where.tags = {
+					some: {
+						tagId: {
+							in: input.tagIds,
+						},
+					},
 				}
 			}
 
@@ -123,6 +142,15 @@ export const resourceRouter = createTRPCRouter({
 								image: true,
 							},
 						},
+						tags: {
+							include: {
+								tag: {
+									include: {
+										group: true,
+									},
+								},
+							},
+						},
 						_count: {
 							select: {
 								characters: true,
@@ -144,12 +172,17 @@ export const resourceRouter = createTRPCRouter({
 	create: protectedProcedure
 		.input(createResourceSchema)
 		.mutation(async ({ ctx, input }) => {
-			const { characterIds, ...data } = input
+			const { characterIds, tagIds, ...data } = input
 
 			return await ctx.prisma.resource.create({
 				data: {
 					...data,
 					uploaderId: ctx.session.user.id,
+					tags: {
+						create: tagIds.map((tagId) => ({
+							tagId,
+						})),
+					},
 					characters: {
 						create: characterIds.map((characterId) => ({
 							characterId,
@@ -157,6 +190,15 @@ export const resourceRouter = createTRPCRouter({
 					},
 				},
 				include: {
+					tags: {
+						include: {
+							tag: {
+								include: {
+									group: true,
+								},
+							},
+						},
+					},
 					characters: {
 						include: {
 							character: true,
@@ -170,7 +212,7 @@ export const resourceRouter = createTRPCRouter({
 	update: protectedProcedure
 		.input(updateResourceSchema)
 		.mutation(async ({ ctx, input }) => {
-			const { id, characterIds, ...data } = input
+			const { id, characterIds, tagIds, ...data } = input
 
 			// Verify ownership or admin rights
 			const resource = await ctx.prisma.resource.findUnique({
@@ -196,7 +238,14 @@ export const resourceRouter = createTRPCRouter({
 				where: { id },
 				data: {
 					...(data.title && { title: data.title }),
-					...(data.dynamicTags && { dynamicTags: data.dynamicTags }),
+					...(tagIds !== undefined && {
+						tags: {
+							deleteMany: {},
+							create: tagIds.map((tagId) => ({
+								tagId,
+							})),
+						},
+					}),
 					...(characterIds && {
 						characters: {
 							deleteMany: {},
@@ -207,6 +256,15 @@ export const resourceRouter = createTRPCRouter({
 					}),
 				},
 				include: {
+					tags: {
+						include: {
+							tag: {
+								include: {
+									group: true,
+								},
+							},
+						},
+					},
 					characters: {
 						include: {
 							character: true,

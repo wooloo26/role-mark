@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client"
+import { PrismaClient, TagScope } from "@prisma/client"
 import bcrypt from "bcryptjs"
 
 const prisma = new PrismaClient()
@@ -24,7 +24,112 @@ async function main() {
 
 	console.log("✅ Created demo user:", user.email)
 
-	// Create sample characters
+	// Create tag groups for characters
+	const personalityGroup = await prisma.tagGroup.create({
+		data: {
+			name: "Personality",
+			scope: TagScope.CHARACTER,
+		},
+	})
+
+	const roleGroup = await prisma.tagGroup.create({
+		data: {
+			name: "Role",
+			scope: TagScope.CHARACTER,
+		},
+	})
+
+	console.log("✅ Created character tag groups")
+
+	// Create tag groups for resources
+	const resourceTypeGroup = await prisma.tagGroup.create({
+		data: {
+			name: "Type",
+			scope: TagScope.RESOURCE,
+		},
+	})
+
+	console.log("✅ Created resource tag groups")
+
+	// Create character tags
+	const braveTag = await prisma.tag.create({
+		data: {
+			name: "Brave",
+			slug: "brave",
+			scope: TagScope.CHARACTER,
+			groupId: personalityGroup.id,
+		},
+	})
+
+	const kindTag = await prisma.tag.create({
+		data: {
+			name: "Kind",
+			slug: "kind",
+			scope: TagScope.CHARACTER,
+			groupId: personalityGroup.id,
+		},
+	})
+
+	const adventurerTag = await prisma.tag.create({
+		data: {
+			name: "Adventurer",
+			slug: "adventurer",
+			scope: TagScope.CHARACTER,
+			groupId: roleGroup.id,
+		},
+	})
+
+	const mysteriousTag = await prisma.tag.create({
+		data: {
+			name: "Mysterious",
+			slug: "mysterious",
+			scope: TagScope.CHARACTER,
+			groupId: personalityGroup.id,
+		},
+	})
+
+	const mageTag = await prisma.tag.create({
+		data: {
+			name: "Mage",
+			slug: "mage",
+			scope: TagScope.CHARACTER,
+			groupId: roleGroup.id,
+		},
+	})
+
+	const wiseTag = await prisma.tag.create({
+		data: {
+			name: "Wise",
+			slug: "wise",
+			scope: TagScope.CHARACTER,
+			groupId: personalityGroup.id,
+		},
+	})
+
+	console.log("✅ Created character tags")
+
+	// Create resource tags
+	const portraitTag = await prisma.tag.create({
+		data: {
+			name: "Portrait",
+			slug: "portrait",
+			scope: TagScope.RESOURCE,
+			groupId: resourceTypeGroup.id,
+		},
+	})
+
+	const artworkTag = await prisma.tag.create({
+		data: {
+			name: "Artwork",
+			slug: "artwork",
+			scope: TagScope.RESOURCE,
+			groupId: resourceTypeGroup.id,
+		},
+	})
+
+	console.log("✅ Created resource tags")
+
+	// Create sample characters with tags
 	const character1 = await prisma.character.create({
 		data: {
 			name: "Alice",
@@ -34,7 +139,13 @@ async function main() {
 				weight: 52,
 				birthday: "2000-03-15",
 			},
-			dynamicTags: ["brave", "kind", "adventurer"],
+			tags: {
+				create: [
+					{ tagId: braveTag.id },
+					{ tagId: kindTag.id },
+					{ tagId: adventurerTag.id },
+				],
+			},
 		},
 	})
 
@@ -47,7 +158,13 @@ async function main() {
 				weight: 68,
 				birthday: "1998-08-22",
 			},
-			dynamicTags: ["mysterious", "mage", "wise"],
+			tags: {
+				create: [
+					{ tagId: mysteriousTag.id },
+					{ tagId: mageTag.id },
+					{ tagId: wiseTag.id },
+				],
+			},
 		},
 	})
 
@@ -65,14 +182,16 @@ async function main() {
 
 	console.log("✅ Created character relationship")
 
-	// Create a sample resource
+	// Create a sample resource with tags
 	const resource = await prisma.resource.create({
 		data: {
 			title: "Character Portrait Collection",
 			fileUrl: "/uploads/portraits/collection-1.jpg",
 			mimeType: "image/jpeg",
 			uploaderId: user.id,
-			dynamicTags: ["portrait", "artwork"],
+			tags: {
+				create: [{ tagId: portraitTag.id }, { tagId: artworkTag.id }],
+			},
 			characters: {
 				create: [
 					{ characterId: character1.id },

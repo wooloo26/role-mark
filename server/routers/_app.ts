@@ -5,6 +5,7 @@ import { createTRPCRouter } from "../trpc"
 import { characterRouter } from "./character"
 import { commentRouter } from "./comment"
 import { resourceRouter } from "./resource"
+import { tagRouter } from "./tag"
 import { userRouter } from "./user"
 import { wikiRouter } from "./wiki"
 
@@ -14,6 +15,7 @@ export const appRouter = createTRPCRouter({
 	wiki: wikiRouter,
 	comment: commentRouter,
 	user: userRouter,
+	tag: tagRouter,
 })
 
 // Export type definition of API
