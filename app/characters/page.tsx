@@ -292,12 +292,11 @@ export default function CharactersPage() {
 												</CardDescription>
 											)}
 
-											{/* Tags - Show only pinned */}
+											{/* Tags - Show tags from pinned groups and individually pinned tags */}
 											{character.tags &&
-												character.tags.length > 0 &&
 												(() => {
 													const pinnedTags = character.tags.filter(
-														(ct) => ct.tag.pinned,
+														(ct) => ct.tag.pinned || ct.tag.group?.pinned,
 													)
 													return (
 														<div className="flex flex-wrap gap-1">
@@ -310,13 +309,6 @@ export default function CharactersPage() {
 																	{ct.tag.name}
 																</Badge>
 															))}
-															{pinnedTags.length === 0 &&
-																character.tags.length > 0 && (
-																	<span className="text-xs text-muted-foreground italic">
-																		{character.tags.length} tag
-																		{character.tags.length !== 1 ? "s" : ""}
-																	</span>
-																)}
 														</div>
 													)
 												})()}
