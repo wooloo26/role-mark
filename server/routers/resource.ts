@@ -9,12 +9,13 @@
 import { ContentType, ResourceType } from "@prisma/client"
 import { TRPCError } from "@trpc/server"
 import { z } from "zod"
+import { deleteFiles } from "@/lib/file-storage"
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc"
 
 // File schema for creating resource files
 const resourceFileSchema = z.object({
 	fileName: z.string().min(1),
-	fileUrl: z.string().url(),
+	fileUrl: z.url(),
 	mimeType: z.string(),
 	fileSize: z.number().int().positive().optional(),
 	order: z.number().int().min(0).default(0),
@@ -25,9 +26,9 @@ const createResourceSchema = z
 	.object({
 		title: z.string().min(1).max(255),
 		description: z.string().optional(),
-		type: z.nativeEnum(ResourceType),
-		contentType: z.nativeEnum(ContentType).nullable().optional(),
-		thumbnailUrl: z.string().url().optional(),
+		type: z.enum(ResourceType),
+		contentType: z.enum(ContentType).nullable().optional(),
+		thumbnailUrl: z.url().optional(),
 		files: z.array(resourceFileSchema).min(1),
 		tagIds: z.array(z.string()).default([]),
 		characterIds: z.array(z.string()).default([]),
@@ -430,7 +431,14 @@ export const resourceRouter = createTRPCRouter({
 			// Verify ownership
 			const resource = await ctx.prisma.resource.findUnique({
 				where: { id: input.id },
-				select: { uploaderId: true },
+				select: {
+					uploaderId: true,
+					files: {
+						select: {
+							fileUrl: true,
+						},
+					},
+				},
 			})
 
 			if (!resource) {
@@ -447,10 +455,16 @@ export const resourceRouter = createTRPCRouter({
 				})
 			}
 
-			// Files will be automatically deleted due to onDelete: Cascade
-			return await ctx.prisma.resource.delete({
+			// Delete resource from database (files will be automatically deleted due to onDelete: Cascade)
+			await ctx.prisma.resource.delete({
 				where: { id: input.id },
 			})
+
+			// Delete physical files from storage
+			const fileUrls = resource.files.map((f) => f.fileUrl)
+			await deleteFiles(fileUrls)
+
+			return { success: true }
 		}),
 
 	// Get file by ID
