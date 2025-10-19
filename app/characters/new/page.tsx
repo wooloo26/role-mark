@@ -1,12 +1,13 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ArrowLeft, Plus, Upload } from "lucide-react"
+import { ArrowLeft, Plus } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import { ImageUploadWithCrop } from "@/components/image-upload-with-crop"
 import { TagSelector } from "@/components/tag-selector"
 import { AnimatedGradientText } from "@/components/ui/animated-gradient-text"
 import { Button } from "@/components/ui/button"
@@ -182,17 +183,16 @@ export default function NewCharacterPage() {
 								name="avatarUrl"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>Avatar URL</FormLabel>
+										<FormLabel>Avatar</FormLabel>
 										<FormControl>
-											<div className="flex gap-2">
-												<Input
-													placeholder="https://example.com/avatar.jpg"
-													{...field}
-												/>
-												<Button type="button" variant="outline" size="icon">
-													<Upload className="h-4 w-4" />
-												</Button>
-											</div>
+											<ImageUploadWithCrop
+												value={field.value}
+												onChange={field.onChange}
+												aspectRatio={1}
+												cropShape="round"
+												previewClassName="w-24 h-24"
+												label="Upload Avatar"
+											/>
 										</FormControl>
 										<FormDescription>Square image recommended</FormDescription>
 										<FormMessage />
@@ -205,17 +205,16 @@ export default function NewCharacterPage() {
 								name="portraitUrl"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>Portrait URL</FormLabel>
+										<FormLabel>Portrait</FormLabel>
 										<FormControl>
-											<div className="flex gap-2">
-												<Input
-													placeholder="https://example.com/portrait.jpg"
-													{...field}
-												/>
-												<Button type="button" variant="outline" size="icon">
-													<Upload className="h-4 w-4" />
-												</Button>
-											</div>
+											<ImageUploadWithCrop
+												value={field.value}
+												onChange={field.onChange}
+												aspectRatio={3 / 4}
+												cropShape="rect"
+												previewClassName="w-32 h-40"
+												label="Upload Portrait"
+											/>
 										</FormControl>
 										<FormDescription>
 											Full body or portrait image (3:4 ratio recommended)

@@ -9,8 +9,8 @@ import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc"
 // Character input schemas
 const createCharacterSchema = z.object({
 	name: z.string().min(1).max(255),
-	avatarUrl: z.url().optional(),
-	portraitUrl: z.url().optional(),
+	avatarUrl: z.url().optional().or(z.literal("")),
+	portraitUrl: z.url().optional().or(z.literal("")),
 	info: z.string().optional(),
 	staticTags: z
 		.object({
@@ -435,9 +435,11 @@ export const characterRouter = createTRPCRouter({
 				where: { id },
 				data: {
 					...(data.name && { name: data.name }),
-					...(data.avatarUrl !== undefined && { avatarUrl: data.avatarUrl }),
+					...(data.avatarUrl !== undefined && {
+						avatarUrl: data.avatarUrl || null,
+					}),
 					...(data.portraitUrl !== undefined && {
-						portraitUrl: data.portraitUrl,
+						portraitUrl: data.portraitUrl || null,
 					}),
 					...(data.info !== undefined && { info: data.info }),
 					...(staticTagsUpdate && { staticTags: staticTagsUpdate }),
