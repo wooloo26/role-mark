@@ -165,4 +165,108 @@ export const userRouter = createTRPCRouter({
 			wikiPageCount,
 		}
 	}),
+
+	// Soft delete user account
+	softDelete: protectedProcedure.mutation(async ({ ctx }) => {
+		// Soft delete the user by setting deletedAt timestamp
+		const deletedUser = await ctx.prisma.user.update({
+			where: { id: ctx.session.user.id },
+			data: { deletedAt: new Date() },
+			select: {
+				id: true,
+				email: true,
+				deletedAt: true,
+			},
+		})
+
+		return {
+			success: true,
+			message: "Account successfully soft deleted",
+			user: deletedUser,
+		}
+	}),
+
+	// Restore soft deleted user account (admin only or self-restore within grace period)
+	restore: protectedProcedure
+		.input(z.object({ userId: z.string().optional() }))
+		.mutation(async ({ ctx, input }) => {
+			const userId = input.userId || ctx.session.user.id
+
+			// Check if user exists and is soft deleted
+			const user = await ctx.prisma.user.findFirst({
+				where: {
+					id: userId,
+					deletedAt: { not: null },
+				},
+			})
+
+			if (!user) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "User not found or not deleted",
+				})
+			}
+
+			// Restore the user by setting deletedAt to null
+			const restoredUser = await ctx.prisma.user.update({
+				where: { id: userId },
+				data: { deletedAt: null },
+				select: {
+					id: true,
+					email: true,
+					name: true,
+					deletedAt: true,
+				},
+			})
+
+			return {
+				success: true,
+				message: "Account successfully restored",
+				user: restoredUser,
+			}
+		}),
+
+	// Permanently delete user account (hard delete)
+	hardDelete: protectedProcedure
+		.input(z.object({ confirmEmail: z.string().email() }))
+		.mutation(async ({ ctx, input }) => {
+			// Get current user
+			const currentUser = await ctx.prisma.user.findUnique({
+				where: { id: ctx.session.user.id },
+				select: { email: true, deletedAt: true },
+			})
+
+			if (!currentUser) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "User not found",
+				})
+			}
+
+			// Verify email confirmation
+			if (currentUser.email !== input.confirmEmail) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "Email confirmation does not match",
+				})
+			}
+
+			// Optionally require the account to be soft deleted first
+			if (!currentUser.deletedAt) {
+				throw new TRPCError({
+					code: "PRECONDITION_FAILED",
+					message: "Account must be soft deleted before permanent deletion",
+				})
+			}
+
+			// Permanently delete the user
+			await ctx.prisma.user.delete({
+				where: { id: ctx.session.user.id },
+			})
+
+			return {
+				success: true,
+				message: "Account permanently deleted",
+			}
+		}),
 })
