@@ -1,20 +1,9 @@
 "use client"
 
-import {
-	BookOpen,
-	Database,
-	FolderOpen,
-	Link2,
-	Search,
-	Settings2,
-	Sparkles,
-	Tag,
-	Users,
-} from "lucide-react"
+import { Database, Link2, Settings2, Sparkles } from "lucide-react"
 import Link from "next/link"
 import { ThemeCustomizer } from "@/components/theme/theme-customizer"
 import { AnimatedGradientText } from "@/components/ui/animated-gradient-text"
-import { BentoCard, BentoGrid } from "@/components/ui/bento-grid"
 import { Button } from "@/components/ui/button"
 import {
 	Card,
@@ -37,7 +26,7 @@ import { cn } from "@/lib/utils"
 
 export default function Home() {
 	return (
-		<div className="flex flex-col min-h-screen ">
+		<div className="flex flex-col">
 			{/* Hero Section */}
 			<section className="relative flex flex-col items-center justify-center px-4 py-32 text-center space-y-8 overflow-hidden">
 				{/* Background Effects */}
@@ -77,16 +66,15 @@ export default function Home() {
 					</p>
 
 					<div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
-						<ShimmerButton className="shadow-2xl" shimmerSize="0.15em">
-							<Link
-								href="/characters"
-								className="flex items-center gap-2 px-6 py-3"
+						<Link href="/characters">
+							<ShimmerButton
+								className="shadow-2xl flex items-center gap-2 px-6 py-3"
+								shimmerSize="0.15em"
 							>
 								<Sparkles className="h-4 w-4" />
 								<span>Explore Characters</span>
-							</Link>
-						</ShimmerButton>
-
+							</ShimmerButton>
+						</Link>
 						<Button asChild variant="outline" size="lg" className="px-8">
 							<Link href="/wiki">Browse Wiki</Link>
 						</Button>
@@ -118,71 +106,11 @@ export default function Home() {
 			{/* Features Section */}
 			<section className="container px-4 py-20 mx-auto">
 				<div className="text-center space-y-4 mb-16">
-					<h2 className="text-4xl font-bold tracking-tight">
-						Everything You Need
-					</h2>
+					<h2 className="text-4xl font-bold tracking-tight">Features</h2>
 					<p className="text-lg text-muted-foreground max-w-2xl mx-auto">
 						Powerful features to organize and manage your creative content
 					</p>
 				</div>
-
-				<BentoGrid className="max-w-6xl mx-auto">
-					<BentoCard
-						name="Character Database"
-						className="col-span-3 lg:col-span-2"
-						background={
-							<div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-primary/5 to-transparent" />
-						}
-						Icon={Users}
-						description="Comprehensive character profiles with avatars, portraits, and detailed information"
-						href="/characters"
-						cta="Explore"
-					/>
-					<BentoCard
-						name="Resource Library"
-						className="col-span-3 lg:col-span-1"
-						background={
-							<div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 via-blue-500/5 to-transparent" />
-						}
-						Icon={FolderOpen}
-						description="Organize images, videos, audio, and other media files"
-						href="/resources"
-						cta="Browse"
-					/>
-					<BentoCard
-						name="Wiki System"
-						className="col-span-3 lg:col-span-1"
-						background={
-							<div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 via-purple-500/5 to-transparent" />
-						}
-						Icon={BookOpen}
-						description="Rich Markdown-based wiki pages with version history"
-						href="/wiki"
-						cta="Read"
-					/>
-					<BentoCard
-						name="Smart Tagging"
-						className="col-span-3 lg:col-span-1"
-						background={
-							<div className="absolute inset-0 bg-gradient-to-br from-amber-500/20 via-amber-500/5 to-transparent" />
-						}
-						Icon={Tag}
-						description="Powerful organization with static and dynamic tags"
-						href="/characters"
-						cta="Organize"
-					/>
-					<BentoCard
-						name="Advanced Search"
-						className="col-span-3 lg:col-span-1"
-						background={
-							<div className="absolute inset-0 bg-gradient-to-br from-green-500/20 via-green-500/5 to-transparent" />
-						}
-						Icon={Search}
-						description="Full-text search, tag filtering, and range queries"
-						href="/characters"
-						cta="Search"
-					/>
-				</BentoGrid>
 
 				{/* Additional Features Cards */}
 				<div className="grid gap-6 md:grid-cols-3 mt-16 max-w-6xl mx-auto">
@@ -213,39 +141,6 @@ export default function Home() {
 							</CardDescription>
 						</CardHeader>
 					</Card>
-				</div>
-			</section>
-
-			{/* CTA Section */}
-			<section className="container px-4 py-20 mx-auto">
-				<div className="relative rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-background border-1 border-primary/20 p-12 text-center space-y-6 overflow-hidden">
-					<DotPattern
-						className={cn(
-							"[mask-image:radial-gradient(400px_circle_at_center,white,transparent)]",
-							"opacity-40",
-						)}
-					/>
-					<div className="relative z-10">
-						<h2 className="text-4xl font-bold mb-4">Ready to get started?</h2>
-						<p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-							Sign up now to start organizing your characters, resources, and
-							wiki content with our powerful management platform.
-						</p>
-						<div className="flex flex-col sm:flex-row justify-center gap-4">
-							<ShimmerButton className="shadow-lg" shimmerSize="0.15em">
-								<Link
-									href="/register"
-									className="flex items-center gap-2 px-8 py-3"
-								>
-									<Sparkles className="h-4 w-4" />
-									<span>Create Account</span>
-								</Link>
-							</ShimmerButton>
-							<Button asChild variant="outline" size="lg" className="px-8">
-								<Link href="/login">Sign In</Link>
-							</Button>
-						</div>
-					</div>
 				</div>
 			</section>
 		</div>

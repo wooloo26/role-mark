@@ -3,16 +3,6 @@
 - **Project Type**: Full-stack web application (with SSR), portal website requiring aesthetically pleasing design
 - **Core Objective**: Build a website supporting management of characters, resources, and Wiki content, with emphasis on content organization and a robust tagging system
 
-## Technology Stack
-
-| Layer                     | Technology/Framework | Description                                                                                                 |
-| ------------------------- | -------------------- | ----------------------------------------------------------------------------------------------------------- |
-| **Backend API**           | tRPC                 | Type-safe end-to-end APIs with deep TypeScript integration                                                  |
-| **Server-Side Rendering** | Next.js (App Router) | SSR for public pages, supporting dynamic routes and data prefetching                                        |
-| **ORM**                   | Prisma               | Type-safe database client for PostgreSQL, supporting schema definition and migrations                       |
-| **Frontend UI**           | shadcn/ui + magicui  | Customizable component library based on Radix UI and Tailwind CSS; magicui for advanced interactive effects |
-| **Database**              | PostgreSQL           | Relational database supporting advanced features like JSON fields and full-text search                      |
-
 ## Core Feature Modules
 
 ### 1. Theme System
