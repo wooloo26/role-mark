@@ -1,37 +1,91 @@
 /**
  * Resource router - handles all resource-related operations
+ *
+ * Resources are atomic entities presented to end users.
+ * Three types: SINGLE_FILE, FILE_ARRAY, FOLDER
+ * Content types: IMAGE, VIDEO, OTHER (only for SINGLE_FILE and FILE_ARRAY)
  */
 
+import { ContentType, ResourceType } from "@prisma/client"
 import { TRPCError } from "@trpc/server"
 import { z } from "zod"
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc"
 
-const createResourceSchema = z.object({
-	title: z.string().min(1).max(255),
-	fileUrl: z.url(),
+// File schema for creating resource files
+const resourceFileSchema = z.object({
+	fileName: z.string().min(1),
+	fileUrl: z.string().url(),
 	mimeType: z.string(),
-	tagIds: z.array(z.string()).default([]),
-	characterIds: z.array(z.string()).default([]),
+	fileSize: z.number().int().positive().optional(),
+	order: z.number().int().min(0).default(0),
+	metadata: z.record(z.string(), z.any()).optional(),
 })
+
+const createResourceSchema = z
+	.object({
+		title: z.string().min(1).max(255),
+		description: z.string().optional(),
+		type: z.nativeEnum(ResourceType),
+		contentType: z.nativeEnum(ContentType).nullable().optional(),
+		thumbnailUrl: z.string().url().optional(),
+		files: z.array(resourceFileSchema).min(1),
+		tagIds: z.array(z.string()).default([]),
+		characterIds: z.array(z.string()).default([]),
+	})
+	.refine(
+		(data) => {
+			// FOLDER type must have contentType as null
+			if (
+				data.type === ResourceType.FOLDER &&
+				data.contentType !== null &&
+				data.contentType !== undefined
+			) {
+				return false
+			}
+			// SINGLE_FILE and FILE_ARRAY should have a contentType
+			if (
+				(data.type === ResourceType.SINGLE_FILE ||
+					data.type === ResourceType.FILE_ARRAY) &&
+				!data.contentType
+			) {
+				return false
+			}
+			// SINGLE_FILE must have exactly one file
+			if (data.type === ResourceType.SINGLE_FILE && data.files.length !== 1) {
+				return false
+			}
+			return true
+		},
+		{
+			message: "Invalid combination of type, contentType, and files",
+		},
+	)
 
 const updateResourceSchema = z.object({
 	id: z.string(),
 	title: z.string().min(1).max(255).optional(),
+	description: z.string().optional(),
+	thumbnailUrl: z.string().url().optional(),
 	tagIds: z.array(z.string()).optional(),
 	characterIds: z.array(z.string()).optional(),
+	// Note: type, contentType, and files cannot be updated to maintain data integrity
 })
 
 const resourceSearchSchema = z.object({
 	title: z.string().optional(),
+	type: z.nativeEnum(ResourceType).optional(),
+	contentType: z.nativeEnum(ContentType).optional(),
 	tagIds: z.array(z.string()).optional(),
-	mimeType: z.string().optional(),
 	characterId: z.string().optional(),
+	uploaderId: z.string().optional(),
 	limit: z.number().min(1).max(100).default(20),
 	offset: z.number().min(0).default(0),
+	sortBy: z.enum(["createdAt", "updatedAt", "title"]).default("createdAt"),
+	sortOrder: z.enum(["asc", "desc"]).default("desc"),
 })
 
 export const resourceRouter = createTRPCRouter({
-	// Get resource by ID
+	// Get resource by ID with all files
 	getById: publicProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ ctx, input }) => {
@@ -43,6 +97,11 @@ export const resourceRouter = createTRPCRouter({
 							id: true,
 							name: true,
 							image: true,
+						},
+					},
+					files: {
+						orderBy: {
+							order: "asc",
 						},
 					},
 					tags: {
@@ -78,28 +137,30 @@ export const resourceRouter = createTRPCRouter({
 			return resource
 		}),
 
-	// Search/list resources
+	// Search/list resources with filtering
 	search: publicProcedure
 		.input(resourceSearchSchema)
 		.query(async ({ ctx, input }) => {
-			const where: {
-				title?: { contains: string; mode: "insensitive" }
-				tags?: {
-					some: {
-						tagId: {
-							in: string[]
-						}
-					}
-				}
-				mimeType?: { contains: string }
-				characters?: { some: { characterId: string } }
-			} = {}
+			// biome-ignore lint/suspicious/noExplicitAny: Dynamic where clause construction
+			const where: any = {}
 
 			if (input.title) {
 				where.title = {
 					contains: input.title,
 					mode: "insensitive",
 				}
+			}
+
+			if (input.type) {
+				where.type = input.type
+			}
+
+			if (input.contentType) {
+				where.contentType = input.contentType
+			}
+
+			if (input.uploaderId) {
+				where.uploaderId = input.uploaderId
 			}
 
 			if (input.tagIds && input.tagIds.length > 0) {
@@ -109,12 +170,6 @@ export const resourceRouter = createTRPCRouter({
 							in: input.tagIds,
 						},
 					},
-				}
-			}
-
-			if (input.mimeType) {
-				where.mimeType = {
-					contains: input.mimeType,
 				}
 			}
 
@@ -132,7 +187,7 @@ export const resourceRouter = createTRPCRouter({
 					take: input.limit,
 					skip: input.offset,
 					orderBy: {
-						createdAt: "desc",
+						[input.sortBy]: input.sortOrder,
 					},
 					include: {
 						uploader: {
@@ -141,6 +196,12 @@ export const resourceRouter = createTRPCRouter({
 								name: true,
 								image: true,
 							},
+						},
+						files: {
+							orderBy: {
+								order: "asc",
+							},
+							take: 1, // For list view, just get first file for preview
 						},
 						tags: {
 							include: {
@@ -154,6 +215,7 @@ export const resourceRouter = createTRPCRouter({
 						_count: {
 							select: {
 								characters: true,
+								files: true,
 							},
 						},
 					},
@@ -168,16 +230,86 @@ export const resourceRouter = createTRPCRouter({
 			}
 		}),
 
-	// Create resource (protected)
+	// Get resources by character ID
+	getByCharacterId: publicProcedure
+		.input(
+			z.object({
+				characterId: z.string(),
+				limit: z.number().min(1).max(100).default(20),
+				offset: z.number().min(0).default(0),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const [resources, total] = await Promise.all([
+				ctx.prisma.resource.findMany({
+					where: {
+						characters: {
+							some: {
+								characterId: input.characterId,
+							},
+						},
+					},
+					take: input.limit,
+					skip: input.offset,
+					orderBy: {
+						createdAt: "desc",
+					},
+					include: {
+						files: {
+							orderBy: {
+								order: "asc",
+							},
+						},
+						tags: {
+							include: {
+								tag: true,
+							},
+						},
+						_count: {
+							select: {
+								characters: true,
+							},
+						},
+					},
+				}),
+				ctx.prisma.resource.count({
+					where: {
+						characters: {
+							some: {
+								characterId: input.characterId,
+							},
+						},
+					},
+				}),
+			])
+
+			return {
+				resources,
+				total,
+				hasMore: input.offset + input.limit < total,
+			}
+		}),
+
+	// Create resource with files (protected)
 	create: protectedProcedure
 		.input(createResourceSchema)
 		.mutation(async ({ ctx, input }) => {
-			const { characterIds, tagIds, ...data } = input
+			const { characterIds, tagIds, files, ...resourceData } = input
 
 			return await ctx.prisma.resource.create({
 				data: {
-					...data,
+					...resourceData,
 					uploaderId: ctx.session.user.id,
+					files: {
+						create: files.map((file) => ({
+							fileName: file.fileName,
+							fileUrl: file.fileUrl,
+							mimeType: file.mimeType,
+							fileSize: file.fileSize,
+							order: file.order,
+							metadata: file.metadata,
+						})),
+					},
 					tags: {
 						create: tagIds.map((tagId) => ({
 							tagId,
@@ -190,6 +322,11 @@ export const resourceRouter = createTRPCRouter({
 					},
 				},
 				include: {
+					files: {
+						orderBy: {
+							order: "asc",
+						},
+					},
 					tags: {
 						include: {
 							tag: {
@@ -208,7 +345,8 @@ export const resourceRouter = createTRPCRouter({
 			})
 		}),
 
-	// Update resource (protected)
+	// Update resource metadata (protected)
+	// Note: Files cannot be updated, type and contentType are immutable
 	update: protectedProcedure
 		.input(updateResourceSchema)
 		.mutation(async ({ ctx, input }) => {
@@ -237,7 +375,13 @@ export const resourceRouter = createTRPCRouter({
 			return await ctx.prisma.resource.update({
 				where: { id },
 				data: {
-					...(data.title && { title: data.title }),
+					...(data.title !== undefined && { title: data.title }),
+					...(data.description !== undefined && {
+						description: data.description,
+					}),
+					...(data.thumbnailUrl !== undefined && {
+						thumbnailUrl: data.thumbnailUrl,
+					}),
 					...(tagIds !== undefined && {
 						tags: {
 							deleteMany: {},
@@ -246,7 +390,7 @@ export const resourceRouter = createTRPCRouter({
 							})),
 						},
 					}),
-					...(characterIds && {
+					...(characterIds !== undefined && {
 						characters: {
 							deleteMany: {},
 							create: characterIds.map((characterId) => ({
@@ -256,6 +400,11 @@ export const resourceRouter = createTRPCRouter({
 					}),
 				},
 				include: {
+					files: {
+						orderBy: {
+							order: "asc",
+						},
+					},
 					tags: {
 						include: {
 							tag: {
@@ -274,7 +423,7 @@ export const resourceRouter = createTRPCRouter({
 			})
 		}),
 
-	// Delete resource (protected)
+	// Delete resource and all associated files (protected)
 	delete: protectedProcedure
 		.input(z.object({ id: z.string() }))
 		.mutation(async ({ ctx, input }) => {
@@ -298,8 +447,85 @@ export const resourceRouter = createTRPCRouter({
 				})
 			}
 
+			// Files will be automatically deleted due to onDelete: Cascade
 			return await ctx.prisma.resource.delete({
 				where: { id: input.id },
 			})
 		}),
+
+	// Get file by ID
+	getFileById: publicProcedure
+		.input(z.object({ id: z.string() }))
+		.query(async ({ ctx, input }) => {
+			const file = await ctx.prisma.resourceFile.findUnique({
+				where: { id: input.id },
+				include: {
+					resource: {
+						select: {
+							id: true,
+							title: true,
+							type: true,
+							contentType: true,
+						},
+					},
+				},
+			})
+
+			if (!file) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "File not found",
+				})
+			}
+
+			return file
+		}),
+
+	// Get statistics
+	getStats: publicProcedure.query(async ({ ctx }) => {
+		const [totalResources, byType, byContentType, recentUploads] =
+			await Promise.all([
+				ctx.prisma.resource.count(),
+				ctx.prisma.resource.groupBy({
+					by: ["type"],
+					_count: true,
+				}),
+				ctx.prisma.resource.groupBy({
+					by: ["contentType"],
+					_count: true,
+					where: {
+						contentType: {
+							not: null,
+						},
+					},
+				}),
+				ctx.prisma.resource.findMany({
+					take: 10,
+					orderBy: {
+						createdAt: "desc",
+					},
+					select: {
+						id: true,
+						title: true,
+						type: true,
+						contentType: true,
+						thumbnailUrl: true,
+						createdAt: true,
+						uploader: {
+							select: {
+								name: true,
+								image: true,
+							},
+						},
+					},
+				}),
+			])
+
+		return {
+			total: totalResources,
+			byType,
+			byContentType,
+			recentUploads,
+		}
+	}),
 })

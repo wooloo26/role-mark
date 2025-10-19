@@ -127,6 +127,24 @@ async function main() {
 		},
 	})
 
+	const animationTag = await prisma.tag.create({
+		data: {
+			name: "Animation",
+			slug: "animation",
+			scope: TagScope.RESOURCE,
+			groupId: resourceTypeGroup.id,
+		},
+	})
+
+	const modelTag = await prisma.tag.create({
+		data: {
+			name: "3D Model",
+			slug: "3d-model",
+			scope: TagScope.RESOURCE,
+			groupId: resourceTypeGroup.id,
+		},
+	})
+
 	console.log("✅ Created resource tags")
 
 	// Create static tag definitions
@@ -234,13 +252,35 @@ async function main() {
 
 	console.log("✅ Created character relationship")
 
-	// Create a sample resource with tags
-	const resource = await prisma.resource.create({
+	// Create a sample resource with tags (FILE_ARRAY with images)
+	const resource1 = await prisma.resource.create({
 		data: {
 			title: "Character Portrait Collection",
-			fileUrl: "/uploads/portraits/collection-1.jpg",
-			mimeType: "image/jpeg",
+			description: "A collection of character portraits",
+			type: "FILE_ARRAY",
+			contentType: "IMAGE",
+			thumbnailUrl: "/uploads/portraits/collection-1-thumb.jpg",
 			uploaderId: user.id,
+			files: {
+				create: [
+					{
+						fileName: "portrait-1.jpg",
+						fileUrl: "/uploads/portraits/portrait-1.jpg",
+						mimeType: "image/jpeg",
+						fileSize: 245600,
+						order: 0,
+						metadata: { width: 800, height: 1200 },
+					},
+					{
+						fileName: "portrait-2.jpg",
+						fileUrl: "/uploads/portraits/portrait-2.jpg",
+						mimeType: "image/jpeg",
+						fileSize: 189400,
+						order: 1,
+						metadata: { width: 800, height: 1200 },
+					},
+				],
+			},
 			tags: {
 				create: [{ tagId: portraitTag.id }, { tagId: artworkTag.id }],
 			},
@@ -253,7 +293,85 @@ async function main() {
 		},
 	})
 
-	console.log("✅ Created sample resource:", resource.title)
+	console.log("✅ Created sample resource (FILE_ARRAY):", resource1.title)
+
+	// Create a SINGLE_FILE video resource
+	const resource2 = await prisma.resource.create({
+		data: {
+			title: "Character Animation Demo",
+			description: "Animated showcase of character",
+			type: "SINGLE_FILE",
+			contentType: "VIDEO",
+			thumbnailUrl: "/uploads/videos/demo-thumb.jpg",
+			uploaderId: user.id,
+			files: {
+				create: {
+					fileName: "character-animation.mp4",
+					fileUrl: "/uploads/videos/character-animation.mp4",
+					mimeType: "video/mp4",
+					fileSize: 5242880,
+					order: 0,
+					metadata: { duration: 120, width: 1920, height: 1080 },
+				},
+			},
+			tags: {
+				create: [{ tagId: animationTag.id }],
+			},
+			characters: {
+				create: [{ characterId: character1.id }],
+			},
+		},
+	})
+
+	console.log(
+		"✅ Created sample resource (SINGLE_FILE VIDEO):",
+		resource2.title,
+	)
+
+	// Create a FOLDER resource (e.g., Live2D model bundle)
+	const resource3 = await prisma.resource.create({
+		data: {
+			title: "Live2D Character Model",
+			description: "Complete Live2D model with all dependencies",
+			type: "FOLDER",
+			contentType: null,
+			thumbnailUrl: "/uploads/models/live2d-thumb.jpg",
+			uploaderId: user.id,
+			files: {
+				create: [
+					{
+						fileName: "model.json",
+						fileUrl: "/uploads/models/live2d/model.json",
+						mimeType: "application/json",
+						fileSize: 2048,
+						order: 0,
+					},
+					{
+						fileName: "texture_00.png",
+						fileUrl: "/uploads/models/live2d/texture_00.png",
+						mimeType: "image/png",
+						fileSize: 512000,
+						order: 1,
+					},
+					{
+						fileName: "motion.moc3",
+						fileUrl: "/uploads/models/live2d/motion.moc3",
+						mimeType: "application/octet-stream",
+						fileSize: 102400,
+						order: 2,
+					},
+				],
+			},
+			tags: {
+				create: [{ tagId: modelTag.id }],
+			},
+			characters: {
+				create: [{ characterId: character2.id }],
+			},
+		},
+	})
+
+	console.log("✅ Created sample resource (FOLDER):", resource3.title)
 
 	// Create a sample wiki page
 	const wikiPage = await prisma.wikiPage.create({

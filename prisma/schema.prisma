@@ -154,24 +154,64 @@ model CharacterRelation {
   @@map("character_relations")
 }
 
+// =============================
+// RESOURCE TYPES & CONTENT TYPES
+// =============================
+
+enum ResourceType {
+  SINGLE_FILE // A single file resource
+  FILE_ARRAY // Multiple independent files
+  FOLDER // A bundle of related files treated as one logical unit
+}
+
+enum ContentType {
+  IMAGE // Images requiring preview generation
+  VIDEO // Videos requiring playback support
+  OTHER // Generic files without special handling
+}
+
 model Resource {
-  id         String        @id @default(cuid())
-  title      String
-  fileUrl    String
-  mimeType   String
-  uploaderId String?
+  id           String        @id @default(cuid())
+  title        String
+  description  String?       @db.Text // Optional description of the resource
+  type         ResourceType // Type of resource: single file, file array, or folder
+  contentType  ContentType? // Content type for processing logic (only for SINGLE_FILE and FILE_ARRAY, null for FOLDER)
+  thumbnailUrl String? // URL/path to the thumbnail image
+  uploaderId   String?
   // dynamic tags are stored in the dedicated Tag model and associated via ResourceTag
-  tags       ResourceTag[]
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
+  tags         ResourceTag[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 
   uploader   User?                 @relation("ResourceUploader", fields: [uploaderId], references: [id], onDelete: SetNull)
+  files      ResourceFile[] // Individual files belonging to this resource
   characters CharacterOnResource[]
 
   @@index([title])
-  @@index([mimeType])
+  @@index([type])
+  @@index([contentType]) // Nullable - only for SINGLE_FILE and FILE_ARRAY
   @@index([uploaderId])
+  @@index([type, contentType]) // Combined index for filtering SINGLE_FILE and FILE_ARRAY by content type
   @@map("resources")
+}
+
+model ResourceFile {
+  id         String   @id @default(cuid())
+  resourceId String
+  fileName   String // Original file name
+  fileUrl    String // Storage URL/path
+  mimeType   String // MIME type of the file
+  fileSize   Int? // File size in bytes
+  order      Int      @default(0) // Order for files in FILE_ARRAY or FOLDER
+  metadata   Json? // Additional metadata (dimensions, duration, etc.)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  resource Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  @@index([resourceId])
+  @@index([resourceId, order]) // For efficient ordered retrieval
+  @@map("resource_files")
 }
 
 model WikiPage {
