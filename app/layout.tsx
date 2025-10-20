@@ -6,6 +6,7 @@ import { SessionProvider } from "@/components/providers/session-provider"
 import { ThemeProvider, ThemeScript } from "@/components/theme/theme-provider"
 import { TRPCProvider } from "@/lib/trpc/provider"
 import "./globals.css"
+import { Toaster } from "@/components/ui/sonner"
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -45,6 +46,7 @@ export default function RootLayout({
 								<Header />
 								<main className="flex-1 w-full">{children}</main>
 								<Footer />
+								<Toaster />
 							</div>
 						</TRPCProvider>
 					</SessionProvider>
