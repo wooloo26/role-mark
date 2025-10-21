@@ -3,9 +3,9 @@
 import type { TagScope } from "@prisma/client"
 import { X } from "lucide-react"
 import { useState } from "react"
+import { trpc } from "@/client/trpc"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { trpc } from "@/lib/trpc/client"
 import { cn } from "@/lib/utils"
 
 interface TagSelectorProps {

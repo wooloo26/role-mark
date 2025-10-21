@@ -1,13 +1,13 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import type { ComponentTheme, ThemeSettings } from "@/lib/theme-config"
+import type { ComponentTheme, ThemeSettings } from "@/client/theme-config"
 import {
 	applyComponentTheme,
 	defaultThemeSettings,
 	getStoredThemeSettings,
 	saveThemeSettings,
-} from "@/lib/theme-config"
+} from "@/client/theme-config"
 
 export function useThemeSettings() {
 	const [settings, setSettings] = useState<ThemeSettings>(defaultThemeSettings)

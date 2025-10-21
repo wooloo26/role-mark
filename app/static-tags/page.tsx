@@ -10,7 +10,7 @@ import {
 import { StaticTagsPageClient } from "@/components/static-tags/static-tags-page-client"
 import { StaticTagsTabContent } from "@/components/static-tags/static-tags-tab-content"
 import { TabsContent } from "@/components/ui/tabs"
-import { api } from "@/lib/trpc/server"
+import { api } from "@/server/api"
 
 interface StaticTagsPageProps {
 	searchParams: Promise<{

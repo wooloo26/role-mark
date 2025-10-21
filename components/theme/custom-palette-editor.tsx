@@ -2,6 +2,12 @@
 
 import { Plus, Trash2 } from "lucide-react"
 import { useId, useState } from "react"
+import {
+	addCustomPalette,
+	deleteCustomPalette,
+	getCustomPalettes,
+	type PaletteColors,
+} from "@/client/theme-config"
 import { Button } from "@/components/ui/button"
 import {
 	Card,
@@ -22,12 +28,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {
-	addCustomPalette,
-	deleteCustomPalette,
-	getCustomPalettes,
-	type PaletteColors,
-} from "@/lib/theme-config"
 
 interface CustomPaletteEditorProps {
 	onPaletteCreated?: (name: string) => void

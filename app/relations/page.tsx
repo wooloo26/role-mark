@@ -9,7 +9,7 @@ import {
 import { RelationTypesTabContent } from "@/components/relations/relation-types-tab-content"
 import { RelationsPageClient } from "@/components/relations/relations-page-client"
 import { TabsContent } from "@/components/ui/tabs"
-import { api } from "@/lib/trpc/server"
+import { api } from "@/server/api"
 
 interface RelationsPageProps {
 	searchParams: Promise<{

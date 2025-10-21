@@ -6,6 +6,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
+import { trpc } from "@/client/trpc"
 import { CharacterAttributesForm } from "@/components/characters/character-attributes-form"
 import { CharacterBasicInfoForm } from "@/components/characters/character-basic-info-form"
 import { CharacterFormActions } from "@/components/characters/character-form-actions"
@@ -18,7 +19,6 @@ import {
 } from "@/components/characters/form-schemas"
 import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
-import { trpc } from "@/lib/trpc/client"
 
 interface EditCharacterFormProps {
 	characterId: string

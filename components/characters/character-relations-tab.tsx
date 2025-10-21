@@ -2,6 +2,7 @@
 
 import { Plus } from "lucide-react"
 import { useState } from "react"
+import { trpc } from "@/client/trpc"
 import { CharacterRelationCard } from "@/components/characters/character-relation-card"
 import { CreateCharacterRelationDialog } from "@/components/characters/create-character-relation-dialog"
 import { DeleteCharacterRelationDialog } from "@/components/characters/delete-character-relation-dialog"
@@ -10,7 +11,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { trpc } from "@/lib/trpc/client"
 
 interface CharacterRelationsTabProps {
 	characterId: string

@@ -16,7 +16,7 @@ import { CharacterResourcesTab } from "@/components/characters/character-resourc
 import { CharacterWikiTab } from "@/components/characters/character-wiki-tab"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { api } from "@/lib/trpc/server"
+import { api } from "@/server/api"
 
 interface CharacterDetailPageProps {
 	params: Promise<{ id: string }>

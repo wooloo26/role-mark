@@ -4,9 +4,9 @@ import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { useTheme } from "next-themes"
 import { createContext, useContext, useEffect, useState } from "react"
+import { useThemeSettings } from "@/client/hooks/use-theme-settings"
+import { trpc } from "@/client/trpc"
 import { SaveSettingsBar } from "@/components/settings/save-settings-bar"
-import { useThemeSettings } from "@/lib/hooks/use-theme-settings"
-import { trpc } from "@/lib/trpc/client"
 
 interface SettingsContextType {
 	showNSFW: boolean

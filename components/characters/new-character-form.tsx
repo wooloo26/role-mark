@@ -5,6 +5,7 @@ import { Plus } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
+import { trpc } from "@/client/trpc"
 import { CharacterAttributesForm } from "@/components/characters/character-attributes-form"
 import { CharacterBasicInfoForm } from "@/components/characters/character-basic-info-form"
 import { CharacterFormActions } from "@/components/characters/character-form-actions"
@@ -15,7 +16,6 @@ import {
 	characterFormSchema,
 } from "@/components/characters/form-schemas"
 import { Form } from "@/components/ui/form"
-import { trpc } from "@/lib/trpc/client"
 
 export function NewCharacterForm() {
 	const router = useRouter()

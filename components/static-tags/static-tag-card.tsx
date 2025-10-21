@@ -10,6 +10,7 @@ import {
 	TrendingUp,
 } from "lucide-react"
 import { useState } from "react"
+import { trpc } from "@/client/trpc"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -27,7 +28,6 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog"
-import { trpc } from "@/lib/trpc/client"
 import { cn } from "@/lib/utils"
 import { EditStaticTagDialog } from "./edit-static-tag-dialog"
 

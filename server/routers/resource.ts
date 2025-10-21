@@ -9,7 +9,7 @@
 import { ContentType, ResourceType } from "@prisma/client"
 import { TRPCError } from "@trpc/server"
 import { z } from "zod"
-import { deleteFiles } from "@/lib/file-storage"
+import { deleteFiles } from "../file-storage"
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc"
 
 // File schema for creating resource files

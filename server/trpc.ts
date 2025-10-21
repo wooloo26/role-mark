@@ -5,7 +5,7 @@ import { initTRPC, TRPCError } from "@trpc/server"
 import type { Session } from "next-auth"
 import superjson from "superjson"
 import { ZodError } from "zod"
-import { prisma } from "@/lib/prisma"
+import { prisma } from "./prisma"
 
 /**
  * 1. CONTEXT

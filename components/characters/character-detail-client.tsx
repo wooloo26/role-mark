@@ -1,8 +1,8 @@
 "use client"
 
 import { useRouter } from "next/navigation"
+import { trpc } from "@/client/trpc"
 import { CharacterDetailHeader } from "@/components/characters/character-detail-header"
-import { trpc } from "@/lib/trpc/client"
 
 interface CharacterDetailClientProps {
 	characterId: string

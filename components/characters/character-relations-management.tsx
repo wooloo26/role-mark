@@ -2,6 +2,7 @@
 
 import { Filter, Network, Plus, Search } from "lucide-react"
 import { useState } from "react"
+import { trpc } from "@/client/trpc"
 import { CharacterRelationCard } from "@/components/characters/character-relation-card"
 import { CreateCharacterRelationDialog } from "@/components/characters/create-character-relation-dialog"
 import { DeleteCharacterRelationDialog } from "@/components/characters/delete-character-relation-dialog"
@@ -18,7 +19,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select"
-import { trpc } from "@/lib/trpc/client"
 
 interface CharacterRelationsManagementProps {
 	characterId: string

@@ -5,6 +5,7 @@ import { Check, ChevronsUpDown } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import { trpc } from "@/client/trpc"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -45,7 +46,6 @@ import {
 	SelectValue,
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { trpc } from "@/lib/trpc/client"
 import { cn } from "@/lib/utils"
 
 const formSchema = z.object({

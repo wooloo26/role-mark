@@ -2,7 +2,7 @@ import { notFound } from "next/navigation"
 import { Suspense } from "react"
 import { CharacterRelationsManagement } from "@/components/characters/character-relations-management"
 import { Card, CardContent } from "@/components/ui/card"
-import { api } from "@/lib/trpc/server"
+import { api } from "@/server/api"
 
 interface CharacterRelationsPageProps {
 	params: Promise<{

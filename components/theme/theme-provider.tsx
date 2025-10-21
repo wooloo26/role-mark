@@ -7,7 +7,7 @@ import {
 	applyColorPalette,
 	applyComponentTheme,
 	getStoredThemeSettings,
-} from "@/lib/theme-config"
+} from "@/client/theme-config"
 
 function ThemeInitializer() {
 	useEffect(() => {

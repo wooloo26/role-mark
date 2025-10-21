@@ -1,6 +1,8 @@
 "use client"
 
 import { useCallback, useEffect, useId, useState } from "react"
+import { useThemeSettings } from "@/client/hooks/use-theme-settings"
+import { getAllPalettes, isCustomPalette } from "@/client/theme-config"
 import { CustomPaletteEditor } from "@/components/theme/custom-palette-editor"
 import { Button } from "@/components/ui/button"
 import {
@@ -19,8 +21,6 @@ import {
 	SelectValue,
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { useThemeSettings } from "@/lib/hooks/use-theme-settings"
-import { getAllPalettes, isCustomPalette } from "@/lib/theme-config"
 
 export function ThemeCustomizer() {
 	const { componentTheme, updateComponentTheme, resetToDefaults, isLoaded } =

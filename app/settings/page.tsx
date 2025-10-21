@@ -11,8 +11,8 @@ import { ThemeCustomizer } from "@/components/theme/theme-customizer"
 import { ThemeToggle } from "@/components/theme/theme-toggle"
 import { Separator } from "@/components/ui/separator"
 import { TabsContent } from "@/components/ui/tabs"
-import { authOptions } from "@/lib/auth"
-import { api } from "@/lib/trpc/server"
+import { api } from "@/server/api"
+import { authOptions } from "@/server/auth"
 
 interface SettingsPageProps {
 	searchParams: Promise<{

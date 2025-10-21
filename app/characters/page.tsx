@@ -4,7 +4,7 @@ import { CharactersListClient } from "@/components/characters/characters-list-cl
 import { CharactersPaginationClient } from "@/components/characters/characters-pagination-client"
 import { EmptyState } from "@/components/layout/empty-state"
 import { HeroSection } from "@/components/layout/hero-section"
-import { api } from "@/lib/trpc/server"
+import { api } from "@/server/api"
 
 interface CharactersPageProps {
 	searchParams: Promise<{

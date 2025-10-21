@@ -1,6 +1,7 @@
 "use client"
 
 import { AlertTriangle } from "lucide-react"
+import { trpc } from "@/client/trpc"
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -11,7 +12,6 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { trpc } from "@/lib/trpc/client"
 
 interface DeleteCharacterRelationDialogProps {
 	relationId: string

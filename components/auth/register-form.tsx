@@ -4,11 +4,11 @@ import { Lock, Mail, User, UserPlus } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { trpc } from "@/client/trpc"
 import { AuthCard } from "@/components/auth/auth-card"
 import { ErrorMessage } from "@/components/auth/error-message"
 import { FormInput } from "@/components/auth/form-input"
 import { SubmitButton } from "@/components/auth/submit-button"
-import { trpc } from "@/lib/trpc/client"
 
 export function RegisterForm() {
 	const router = useRouter()

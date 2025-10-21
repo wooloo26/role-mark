@@ -4,7 +4,7 @@
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch"
 import type { NextRequest } from "next/server"
 import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { authOptions } from "@/server/auth"
 import { appRouter } from "@/server/routers/_app"
 import { createTRPCContext } from "@/server/trpc"
 

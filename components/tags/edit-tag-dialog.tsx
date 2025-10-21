@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import { trpc } from "@/client/trpc"
 import { Button } from "@/components/ui/button"
 import {
 	Dialog,
@@ -31,7 +32,6 @@ import {
 	SelectValue,
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { trpc } from "@/lib/trpc/client"
 
 const formSchema = z.object({
 	name: z.string().min(1, "Name is required").max(100).optional(),

@@ -3,7 +3,7 @@
  * Access at: http://localhost:3000/api/health
  */
 import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import { prisma } from "@/server/prisma"
 
 export async function GET() {
 	try {

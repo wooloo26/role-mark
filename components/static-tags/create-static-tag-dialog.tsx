@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { StaticTagDataType } from "@prisma/client"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import { trpc } from "@/client/trpc"
 import { Button } from "@/components/ui/button"
 import {
 	Dialog,
@@ -32,7 +33,6 @@ import {
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
-import { trpc } from "@/lib/trpc/client"
 
 const formSchema = z.object({
 	name: z

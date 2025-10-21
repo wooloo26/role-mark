@@ -1,10 +1,10 @@
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
+import { TRPCProvider } from "@/client/trpc"
 import { Footer } from "@/components/layout/footer"
 import { Header } from "@/components/layout/header"
 import { SessionProvider } from "@/components/providers/session-provider"
 import { ThemeProvider, ThemeScript } from "@/components/theme/theme-provider"
-import { TRPCProvider } from "@/lib/trpc/provider"
 import "./globals.css"
 import { Toaster } from "@/components/ui/sonner"
 

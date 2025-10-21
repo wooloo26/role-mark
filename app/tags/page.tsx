@@ -6,7 +6,7 @@ import { TagGroupsTabContent } from "@/components/tags/tag-groups-tab-content"
 import { TagsPageClient } from "@/components/tags/tags-page-client"
 import { TagsTabContent } from "@/components/tags/tags-tab-content"
 import { TabsContent } from "@/components/ui/tabs"
-import { api } from "@/lib/trpc/server"
+import { api } from "@/server/api"
 
 interface TagsPageProps {
 	searchParams: Promise<{
