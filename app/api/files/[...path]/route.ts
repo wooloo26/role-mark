@@ -8,6 +8,7 @@ import { readFile, stat } from "node:fs/promises"
 import path from "node:path"
 import type { NextRequest } from "next/server"
 import { NextResponse } from "next/server"
+import { logError, logSecurityEvent } from "@/server/logger"
 
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads")
 
@@ -43,6 +44,7 @@ export async function GET(
 
 		// Security: prevent path traversal
 		if (filename.includes("..") || filename.includes("\\")) {
+			logSecurityEvent("file_access_path_traversal_attempt", { filename })
 			return NextResponse.json({ error: "Invalid file path" }, { status: 400 })
 		}
 
@@ -75,7 +77,7 @@ export async function GET(
 
 		return response
 	} catch (error) {
-		console.error("File serving error:", error)
+		logError(error, { operation: "file_serving" })
 		return NextResponse.json({ error: "Failed to serve file" }, { status: 500 })
 	}
 }
@@ -90,6 +92,7 @@ export async function HEAD(
 
 		// Security: prevent path traversal
 		if (filename.includes("..") || filename.includes("\\")) {
+			logSecurityEvent("file_head_path_traversal_attempt", { filename })
 			return new NextResponse(null, { status: 400 })
 		}
 
@@ -114,7 +117,7 @@ export async function HEAD(
 			},
 		})
 	} catch (error) {
-		console.error("File HEAD error:", error)
+		logError(error, { operation: "file_head" })
 		return new NextResponse(null, { status: 500 })
 	}
 }

@@ -35,9 +35,9 @@ export function LoginForm() {
 				router.push("/")
 				router.refresh()
 			}
-		} catch (error) {
+		} catch {
 			setError("An error occurred. Please try again.")
-			console.error(error)
+			// Error is already displayed to user via setError
 		} finally {
 			setIsLoading(false)
 		}

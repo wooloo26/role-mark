@@ -8,6 +8,7 @@ import ReactCrop, {
 	type PixelCrop,
 } from "react-image-crop"
 import "react-image-crop/dist/ReactCrop.css"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import {
 	Dialog,
@@ -153,8 +154,8 @@ export function ImageCropDialog({
 			)
 			onCropComplete(croppedImageBlob)
 			onOpenChange(false)
-		} catch (error) {
-			console.error("Error cropping image:", error)
+		} catch {
+			toast.error("Failed to crop image")
 		} finally {
 			setIsProcessing(false)
 		}

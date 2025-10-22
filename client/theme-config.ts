@@ -205,8 +205,9 @@ export function getStoredThemeSettings(): ThemeSettings {
 				},
 			}
 		}
-	} catch (error) {
-		console.error("Error loading theme settings:", error)
+	} catch {
+		// Silently fall back to defaults if localStorage fails
+		// (e.g., in incognito mode or with strict privacy settings)
 	}
 
 	return defaultThemeSettings
@@ -220,8 +221,8 @@ export function saveThemeSettings(settings: ThemeSettings): void {
 
 	try {
 		localStorage.setItem("themeSettings", JSON.stringify(settings))
-	} catch (error) {
-		console.error("Error saving theme settings:", error)
+	} catch {
+		// Silently fail if localStorage is unavailable
 	}
 }
 
@@ -314,8 +315,8 @@ export function getCustomPalettes(): Record<string, PaletteColors> {
 		if (stored) {
 			return JSON.parse(stored)
 		}
-	} catch (error) {
-		console.error("Error loading custom palettes:", error)
+	} catch {
+		// Silently fall back to empty object if localStorage fails
 	}
 
 	return {}
@@ -331,8 +332,8 @@ export function saveCustomPalettes(
 
 	try {
 		localStorage.setItem("customPalettes", JSON.stringify(palettes))
-	} catch (error) {
-		console.error("Error saving custom palettes:", error)
+	} catch {
+		// Silently fail if localStorage is unavailable
 	}
 }
 

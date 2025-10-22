@@ -5,11 +5,12 @@ import {
 	TagScope,
 } from "@prisma/client"
 import bcrypt from "bcryptjs"
+import { logError, logger } from "../server/logger"
 
 const prisma = new PrismaClient()
 
 async function main() {
-	console.log("🌱 Starting database seeding...")
+	logger.info("🌱 Starting database seeding...")
 
 	// Create a demo user
 	const hashedPassword = await bcrypt.hash("demo123", 10)
@@ -27,7 +28,7 @@ async function main() {
 		},
 	})
 
-	console.log("✅ Created demo user:", user.email)
+	logger.info({ email: user.email }, "✅ Created demo user")
 
 	// Create tag groups for characters
 	const personalityGroup = await prisma.tagGroup.create({
@@ -44,7 +45,7 @@ async function main() {
 		},
 	})
 
-	console.log("✅ Created character tag groups")
+	logger.info("✅ Created character tag groups")
 
 	// Create tag groups for resources
 	const resourceTypeGroup = await prisma.tagGroup.create({
@@ -54,7 +55,7 @@ async function main() {
 		},
 	})
 
-	console.log("✅ Created resource tag groups")
+	logger.info("✅ Created resource tag groups")
 
 	// Create character tags
 	const braveTag = await prisma.tag.create({
@@ -111,7 +112,7 @@ async function main() {
 		},
 	})
 
-	console.log("✅ Created character tags")
+	logger.info("✅ Created character tags")
 
 	// Create resource tags
 	const portraitTag = await prisma.tag.create({
@@ -150,7 +151,7 @@ async function main() {
 		},
 	})
 
-	console.log("✅ Created resource tags")
+	logger.info("✅ Created resource tags")
 
 	// Create static tag definitions
 	const heightDef = await prisma.staticTagDefinition.upsert({
@@ -188,7 +189,7 @@ async function main() {
 		},
 	})
 
-	console.log("✅ Created static tag definitions")
+	logger.info("✅ Created static tag definitions")
 
 	// Create sample characters with tags
 	const character1 = await prisma.character.create({
@@ -233,7 +234,10 @@ async function main() {
 		},
 	})
 
-	console.log("✅ Created sample characters:", character1.name, character2.name)
+	logger.info(
+		{ character1: character1.name, character2: character2.name },
+		"✅ Created sample characters",
+	)
 
 	// Create relation types
 	const friendsRelationType = await prisma.relationType.upsert({
@@ -290,7 +294,7 @@ async function main() {
 		},
 	})
 
-	console.log("✅ Created relation types")
+	logger.info("✅ Created relation types")
 
 	// Create a character relationship
 	await prisma.characterRelation.create({
@@ -302,7 +306,7 @@ async function main() {
 		},
 	})
 
-	console.log("✅ Created character relationship")
+	logger.info("✅ Created character relationship")
 
 	// Create a sample resource with tags (FILE_ARRAY with images)
 	const resource1 = await prisma.resource.create({
@@ -345,7 +349,10 @@ async function main() {
 		},
 	})
 
-	console.log("✅ Created sample resource (FILE_ARRAY):", resource1.title)
+	logger.info(
+		{ title: resource1.title },
+		"✅ Created sample resource (FILE_ARRAY)",
+	)
 
 	// Create a SINGLE_FILE video resource
 	const resource2 = await prisma.resource.create({
@@ -375,9 +382,9 @@ async function main() {
 		},
 	})
 
-	console.log(
-		"✅ Created sample resource (SINGLE_FILE VIDEO):",
-		resource2.title,
+	logger.info(
+		{ title: resource2.title },
+		"✅ Created sample resource (SINGLE_FILE VIDEO)",
 	)
 
 	// Create a FOLDER resource (e.g., Live2D model bundle)
@@ -423,7 +430,7 @@ async function main() {
 		},
 	})
 
-	console.log("✅ Created sample resource (FOLDER):", resource3.title)
+	logger.info({ title: resource3.title }, "✅ Created sample resource (FOLDER)")
 
 	// Create a sample wiki page
 	const wikiPage = await prisma.wikiPage.create({
@@ -455,7 +462,7 @@ Start exploring and creating your own content!`,
 		},
 	})
 
-	console.log("✅ Created sample wiki page:", wikiPage.title)
+	logger.info({ title: wikiPage.title }, "✅ Created sample wiki page")
 
 	// Create a sample comment
 	await prisma.comment.create({
@@ -468,12 +475,12 @@ Start exploring and creating your own content!`,
 		},
 	})
 
-	console.log("✅ Created sample comment")
+	logger.info("✅ Created sample comment")
 
-	console.log("\n🎉 Database seeding completed successfully!")
-	console.log("\n📝 Demo credentials:")
-	console.log("   Email: demo@example.com")
-	console.log("   Password: demo123")
+	logger.info("\n🎉 Database seeding completed successfully!")
+	logger.info("\n📝 Demo credentials:")
+	logger.info("   Email: demo@example.com")
+	logger.info("   Password: demo123")
 }
 
 main()
@@ -481,7 +488,7 @@ main()
 		await prisma.$disconnect()
 	})
 	.catch(async (e) => {
-		console.error("❌ Error during seeding:", e)
+		logError(e, { operation: "database_seeding" })
 		await prisma.$disconnect()
 		process.exit(1)
 	})

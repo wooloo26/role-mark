@@ -5,6 +5,7 @@
 
 import path from "node:path"
 import { ContentType } from "@prisma/client"
+import { logError } from "./logger"
 
 // File size limits (in bytes)
 export const FILE_SIZE_LIMITS = {
@@ -141,7 +142,7 @@ export function getImageDimensions(
 
 		return null
 	} catch (error) {
-		console.error("Error parsing image dimensions:", error)
+		logError(error, { operation: "getImageDimensions" })
 		return null
 	}
 }

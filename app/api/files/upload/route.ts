@@ -12,6 +12,7 @@ import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/server/auth"
 import { getContentTypeFromMime } from "@/server/file-utils"
+import { logError } from "@/server/logger"
 
 // Configure max file size (50MB)
 export const config = {
@@ -97,7 +98,7 @@ export async function POST(request: NextRequest) {
 			files: uploadedFiles,
 		})
 	} catch (error) {
-		console.error("Upload error:", error)
+		logError(error, { operation: "file_upload" })
 		return NextResponse.json(
 			{ error: "Failed to upload files" },
 			{ status: 500 },

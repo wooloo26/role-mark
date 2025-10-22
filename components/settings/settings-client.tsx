@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { useTheme } from "next-themes"
 import { createContext, useContext, useEffect, useState } from "react"
+import { toast } from "sonner"
 import { useThemeSettings } from "@/client/hooks/use-theme-settings"
 import { trpc } from "@/client/trpc"
 import { SaveSettingsBar } from "@/components/settings/save-settings-bar"
@@ -74,8 +75,8 @@ export function SettingsClient({
 			setTimeout(() => {
 				setIsSaving(false)
 			}, 500)
-		} catch (error) {
-			console.error("Error saving settings:", error)
+		} catch {
+			toast.error("Failed to save settings")
 			setIsSaving(false)
 		}
 	}
