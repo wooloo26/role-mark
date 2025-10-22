@@ -6,6 +6,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
+import { toast } from "sonner"
 import { trpc } from "@/client/trpc"
 import { CharacterAttributesForm } from "@/components/characters/character-attributes-form"
 import { CharacterBasicInfoForm } from "@/components/characters/character-basic-info-form"
@@ -74,7 +75,11 @@ export function EditCharacterForm({ characterId }: EditCharacterFormProps) {
 		onSuccess: async (data) => {
 			// Invalidate and refetch character data
 			await utils.character.getById.invalidate({ id: characterId })
+			toast.success("Character updated successfully")
 			router.push(`/characters/${data.id}`)
+		},
+		onError: (error) => {
+			toast.error(error.message || "Failed to update character")
 		},
 	})
 

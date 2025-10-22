@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { signIn } from "next-auth/react"
 import React from "react"
+import { toast } from "sonner"
 import { AuthCard } from "@/components/auth/auth-card"
 import { ErrorMessage } from "@/components/auth/error-message"
 import { FormInput } from "@/components/auth/form-input"
@@ -31,12 +32,15 @@ export function LoginForm() {
 
 			if (result?.error) {
 				setError("Invalid email or password")
+				toast.error("Invalid email or password")
 			} else {
+				toast.success("Successfully logged in")
 				router.push("/")
 				router.refresh()
 			}
 		} catch {
 			setError("An error occurred. Please try again.")
+			toast.error("An error occurred. Please try again.")
 			// Error is already displayed to user via setError
 		} finally {
 			setIsLoading(false)

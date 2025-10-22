@@ -1,6 +1,7 @@
 "use client"
 
 import { AlertTriangle } from "lucide-react"
+import { toast } from "sonner"
 import { trpc } from "@/client/trpc"
 import {
 	AlertDialog,
@@ -37,6 +38,10 @@ export function DeleteCharacterRelationDialog({
 			utils.relation.getRelations.invalidate({ characterId })
 			utils.character.getById.invalidate({ id: characterId })
 			onOpenChange(false)
+			toast.success("Character relation deleted successfully")
+		},
+		onError: () => {
+			toast.error("Failed to delete character relation")
 		},
 	})
 

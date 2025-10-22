@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
+import { toast } from "sonner"
 import { z } from "zod"
 import { trpc } from "@/client/trpc"
 import { Button } from "@/components/ui/button"
@@ -56,12 +57,16 @@ export function CreateRelationTypeDialog({
 			utils.relation.getAllTypes.invalidate()
 			form.reset()
 			onOpenChange(false)
+			toast.success("Relation type created successfully")
 		},
 		onError: (error) => {
 			if (error.message.includes("already exists")) {
 				form.setError("name", {
 					message: "A relation type with this name already exists",
 				})
+				toast.error("A relation type with this name already exists")
+			} else {
+				toast.error(error.message || "Failed to create relation type")
 			}
 		},
 	})

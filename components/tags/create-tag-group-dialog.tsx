@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { TagScope } from "@prisma/client"
 import { useForm } from "react-hook-form"
+import { toast } from "sonner"
 import { z } from "zod"
 import { trpc } from "@/client/trpc"
 import { Button } from "@/components/ui/button"
@@ -69,6 +70,10 @@ export function CreateTagGroupDialog({
 			utils.tag.getGroupedTags.invalidate()
 			form.reset()
 			onOpenChange(false)
+			toast.success("Tag group created successfully")
+		},
+		onError: (error) => {
+			toast.error(error.message || "Failed to create tag group")
 		},
 	})
 

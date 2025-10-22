@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect } from "react"
 import { useForm } from "react-hook-form"
+import { toast } from "sonner"
 import { z } from "zod"
 import { trpc } from "@/client/trpc"
 import { Button } from "@/components/ui/button"
@@ -86,11 +87,13 @@ export function EditCharacterRelationDialog({
 			utils.relation.getRelations.invalidate({ characterId })
 			utils.character.getById.invalidate({ id: characterId })
 			onOpenChange(false)
+			toast.success("Character relation updated successfully")
 		},
 		onError: (error) => {
 			form.setError("root", {
 				message: error.message,
 			})
+			toast.error(error.message || "Failed to update relation")
 		},
 	})
 

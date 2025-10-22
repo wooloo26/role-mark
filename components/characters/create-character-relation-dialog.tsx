@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
+import { toast } from "sonner"
 import { z } from "zod"
 import { trpc } from "@/client/trpc"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -99,12 +100,16 @@ export function CreateCharacterRelationDialog({
 			utils.character.getById.invalidate({ id: fromCharacterId })
 			form.reset()
 			onOpenChange(false)
+			toast.success("Character relation created successfully")
 		},
 		onError: (error) => {
 			if (error.message.includes("already exists")) {
 				form.setError("root", {
 					message: "This relation already exists",
 				})
+				toast.error("This relation already exists")
+			} else {
+				toast.error(error.message || "Failed to create relation")
 			}
 		},
 	})

@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect } from "react"
 import { useForm } from "react-hook-form"
+import { toast } from "sonner"
 import { z } from "zod"
 import { trpc } from "@/client/trpc"
 import { Button } from "@/components/ui/button"
@@ -70,12 +71,16 @@ export function EditRelationTypeDialog({
 		onSuccess: () => {
 			utils.relation.getAllTypes.invalidate()
 			onOpenChange(false)
+			toast.success("Relation type updated successfully")
 		},
 		onError: (error) => {
 			if (error.message.includes("already exists")) {
 				form.setError("name", {
 					message: "A relation type with this name already exists",
 				})
+				toast.error("A relation type with this name already exists")
+			} else {
+				toast.error(error.message || "Failed to update relation type")
 			}
 		},
 	})

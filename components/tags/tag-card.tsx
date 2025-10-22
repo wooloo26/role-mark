@@ -2,6 +2,7 @@
 
 import { Edit, Hash, Pin, Trash2 } from "lucide-react"
 import { useState } from "react"
+import { toast } from "sonner"
 import { trpc } from "@/client/trpc"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -47,6 +48,10 @@ export function TagCard({ tag, onEdit }: TagCardProps) {
 			utils.tag.getGroupedTags.invalidate()
 			utils.tag.search.invalidate()
 			setDeleteDialogOpen(false)
+			toast.success("Tag deleted successfully")
+		},
+		onError: () => {
+			toast.error("Failed to delete tag")
 		},
 	})
 
@@ -55,6 +60,10 @@ export function TagCard({ tag, onEdit }: TagCardProps) {
 			utils.tag.getGroupedTags.invalidate()
 			utils.tag.search.invalidate()
 			utils.tag.getByScope.invalidate()
+			toast.success("Tag pinned status updated")
+		},
+		onError: () => {
+			toast.error("Failed to update tag")
 		},
 	})
 

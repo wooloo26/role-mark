@@ -5,6 +5,7 @@ import { Plus } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
+import { toast } from "sonner"
 import { trpc } from "@/client/trpc"
 import { CharacterAttributesForm } from "@/components/characters/character-attributes-form"
 import { CharacterBasicInfoForm } from "@/components/characters/character-basic-info-form"
@@ -36,7 +37,11 @@ export function NewCharacterForm() {
 
 	const createMutation = trpc.character.create.useMutation({
 		onSuccess: (data) => {
+			toast.success("Character created successfully")
 			router.push(`/characters/${data.id}`)
+		},
+		onError: (error) => {
+			toast.error(error.message || "Failed to create character")
 		},
 	})
 

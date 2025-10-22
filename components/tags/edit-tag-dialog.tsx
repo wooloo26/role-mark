@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect } from "react"
 import { useForm } from "react-hook-form"
+import { toast } from "sonner"
 import { z } from "zod"
 import { trpc } from "@/client/trpc"
 import { Button } from "@/components/ui/button"
@@ -103,6 +104,10 @@ export function EditTagDialog({
 			utils.tag.search.invalidate()
 			utils.tag.getById.invalidate({ id: tagId })
 			onOpenChange(false)
+			toast.success("Tag updated successfully")
+		},
+		onError: (error) => {
+			toast.error(error.message || "Failed to update tag")
 		},
 	})
 

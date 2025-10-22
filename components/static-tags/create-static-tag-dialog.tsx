@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { StaticTagDataType } from "@prisma/client"
 import { useForm } from "react-hook-form"
+import { toast } from "sonner"
 import { z } from "zod"
 import { trpc } from "@/client/trpc"
 import { Button } from "@/components/ui/button"
@@ -82,12 +83,16 @@ export function CreateStaticTagDialog({
 			utils.staticTag.getStats.invalidate()
 			form.reset()
 			onOpenChange(false)
+			toast.success("Static tag created successfully")
 		},
 		onError: (error) => {
 			if (error.message.includes("already exists")) {
 				form.setError("name", {
 					message: "A static tag with this name already exists",
 				})
+				toast.error("A static tag with this name already exists")
+			} else {
+				toast.error("Failed to create static tag")
 			}
 		},
 	})

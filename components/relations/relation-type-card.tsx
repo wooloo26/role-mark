@@ -2,6 +2,7 @@
 
 import { Edit, Heart, Trash2, Users } from "lucide-react"
 import { useState } from "react"
+import { toast } from "sonner"
 import { trpc } from "@/client/trpc"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -61,6 +62,10 @@ export function RelationTypeCard({ relationType }: RelationTypeCardProps) {
 		onSuccess: () => {
 			utils.relation.getAllTypes.invalidate()
 			setDeleteDialogOpen(false)
+			toast.success("Relation type deleted successfully")
+		},
+		onError: () => {
+			toast.error("Failed to delete relation type")
 		},
 	})
 

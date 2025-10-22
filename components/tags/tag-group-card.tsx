@@ -2,6 +2,7 @@
 
 import { Edit, FolderTree, Hash, Pin, Trash2 } from "lucide-react"
 import { useState } from "react"
+import { toast } from "sonner"
 import { trpc } from "@/client/trpc"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -45,6 +46,10 @@ export function TagGroupCard({ group, onEdit }: TagGroupCardProps) {
 			utils.tag.listGroups.invalidate()
 			utils.tag.getGroupedTags.invalidate()
 			setDeleteDialogOpen(false)
+			toast.success("Tag group deleted successfully")
+		},
+		onError: () => {
+			toast.error("Failed to delete tag group")
 		},
 	})
 
@@ -52,6 +57,10 @@ export function TagGroupCard({ group, onEdit }: TagGroupCardProps) {
 		onSuccess: () => {
 			utils.tag.listGroups.invalidate()
 			utils.tag.getGroupedTags.invalidate()
+			toast.success("Tag group pinned status updated")
+		},
+		onError: () => {
+			toast.error("Failed to update tag group")
 		},
 	})
 

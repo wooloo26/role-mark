@@ -10,6 +10,7 @@ import {
 	TrendingUp,
 } from "lucide-react"
 import { useState } from "react"
+import { toast } from "sonner"
 import { trpc } from "@/client/trpc"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -74,6 +75,10 @@ export function StaticTagCard({ tag }: StaticTagCardProps) {
 			utils.staticTag.getGroupedByDataType.invalidate()
 			utils.staticTag.getStats.invalidate()
 			setDeleteDialogOpen(false)
+			toast.success("Static tag deleted successfully")
+		},
+		onError: () => {
+			toast.error("Failed to delete static tag")
 		},
 	})
 

@@ -4,6 +4,7 @@ import { Lock, Mail, User, UserPlus } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { toast } from "sonner"
 import { trpc } from "@/client/trpc"
 import { AuthCard } from "@/components/auth/auth-card"
 import { ErrorMessage } from "@/components/auth/error-message"
@@ -20,10 +21,12 @@ export function RegisterForm() {
 
 	const registerMutation = trpc.user.register.useMutation({
 		onSuccess: () => {
+			toast.success("Account created successfully! Please log in.")
 			router.push("/login?registered=true")
 		},
 		onError: (error: { message: string }) => {
 			setError(error.message)
+			toast.error(error.message || "Failed to create account")
 		},
 	})
 
