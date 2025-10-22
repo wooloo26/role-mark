@@ -3,6 +3,7 @@
 import { Upload, X } from "lucide-react"
 import Image from "next/image"
 import { useRef, useState } from "react"
+import { toast } from "sonner"
 import { ImageCropDialog } from "@/components/image-crop-dialog"
 import { Button } from "@/components/ui/button"
 
@@ -31,7 +32,7 @@ export function ImageUploadWithCrop({
 		if (file) {
 			// Check if file is an image
 			if (!file.type.startsWith("image/")) {
-				alert("Please select an image file")
+				toast.warning("Please select an image file")
 				return
 			}
 
@@ -70,7 +71,7 @@ export function ImageUploadWithCrop({
 			}
 		} catch (error) {
 			console.error("Failed to upload image:", error)
-			alert("Failed to upload image. Please try again.")
+			toast.error("Failed to upload image. Please try again.")
 		} finally {
 			setIsUploading(false)
 		}

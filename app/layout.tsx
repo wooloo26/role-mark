@@ -46,7 +46,7 @@ export default function RootLayout({
 								<Header />
 								<main className="flex-1 w-full">{children}</main>
 								<Footer />
-								<Toaster />
+								<Toaster position="top-center" expand richColors closeButton />
 							</div>
 						</TRPCProvider>
 					</SessionProvider>

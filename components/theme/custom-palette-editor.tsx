@@ -2,6 +2,7 @@
 
 import { Plus, Trash2 } from "lucide-react"
 import { useId, useState } from "react"
+import { toast } from "sonner"
 import {
 	addCustomPalette,
 	deleteCustomPalette,
@@ -102,7 +103,7 @@ export function CustomPaletteEditor({
 
 	const handleSave = () => {
 		if (!paletteName.trim()) {
-			alert("Please enter a palette name")
+			toast.warning("Please enter a palette name")
 			return
 		}
 
