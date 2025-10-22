@@ -4,7 +4,7 @@
 import "server-only"
 import { getServerSession } from "next-auth"
 import { cache } from "react"
-import { authOptions } from "@/server/auth"
+import { authOptions } from "@/lib/auth"
 import { createCaller } from "@/server/routers/_app"
 import { createTRPCContext } from "@/server/trpc"
 

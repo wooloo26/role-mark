@@ -13,7 +13,6 @@ import {
 	getContentTypeFromMime,
 	getImageDimensions,
 } from "./file-utils"
-import { logError, logSecurityEvent } from "./logger"
 
 const UPLOAD_BASE_DIR = path.join(process.cwd(), "public", "uploads")
 
@@ -121,7 +120,7 @@ export async function deleteFile(fileUrl: string): Promise<boolean> {
 
 		// Security check
 		if (!filepath.startsWith(UPLOAD_BASE_DIR)) {
-			logSecurityEvent("file_delete_attempt_outside_upload_dir", {
+			console.error("file_delete_attempt_outside_upload_dir", {
 				filepath,
 				fileUrl,
 			})
@@ -135,7 +134,7 @@ export async function deleteFile(fileUrl: string): Promise<boolean> {
 
 		return false
 	} catch (error) {
-		logError(error, { operation: "deleteFile", fileUrl })
+		console.error(error, { operation: "deleteFile", fileUrl })
 		return false
 	}
 }
@@ -199,7 +198,7 @@ export async function getUploadsDiskUsage(): Promise<{
 
 		await calculateSize(UPLOAD_BASE_DIR)
 	} catch (error) {
-		logError(error, { operation: "getUploadsDiskUsage" })
+		console.error(error, { operation: "getUploadsDiskUsage" })
 	}
 
 	return result
@@ -241,7 +240,7 @@ export async function cleanupOrphanedFiles(
 
 		return deletedCount
 	} catch (error) {
-		logError(error, { operation: "cleanupOrphanedFiles" })
+		console.error(error, { operation: "cleanupOrphanedFiles" })
 		return 0
 	}
 }
