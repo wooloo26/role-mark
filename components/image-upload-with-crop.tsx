@@ -23,6 +23,7 @@ export function ImageUploadWithCrop({
 }: ImageUploadWithCropProps) {
 	const [imageToCrop, setImageToCrop] = useState<string | null>(null)
 	const [cropDialogOpen, setCropDialogOpen] = useState(false)
+	const [isUploading, setIsUploading] = useState(false)
 	const fileInputRef = useRef<HTMLInputElement>(null)
 
 	const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,13 +47,33 @@ export function ImageUploadWithCrop({
 		e.target.value = ""
 	}
 
-	const handleCropComplete = (croppedImageBlob: Blob) => {
-		// Convert blob to data URL
-		const reader = new FileReader()
-		reader.onload = () => {
-			onChange(reader.result as string)
+	const handleCropComplete = async (croppedImageBlob: Blob) => {
+		setIsUploading(true)
+		try {
+			// Create FormData and upload to server
+			const formData = new FormData()
+			formData.append("files", croppedImageBlob, "cropped-image.png")
+
+			const response = await fetch("/api/files/upload", {
+				method: "POST",
+				body: formData,
+			})
+
+			if (!response.ok) {
+				throw new Error("Upload failed")
+			}
+
+			const data = await response.json()
+			if (data.success && data.files && data.files.length > 0) {
+				// Use the fileUrl from the server response
+				onChange(data.files[0].fileUrl)
+			}
+		} catch (error) {
+			console.error("Failed to upload image:", error)
+			alert("Failed to upload image. Please try again.")
+		} finally {
+			setIsUploading(false)
 		}
-		reader.readAsDataURL(croppedImageBlob)
 	}
 
 	const handleUploadClick = () => {
@@ -71,9 +92,10 @@ export function ImageUploadWithCrop({
 					variant="outline"
 					onClick={handleUploadClick}
 					className="flex-1"
+					disabled={isUploading}
 				>
 					<Upload className="h-4 w-4 mr-2" />
-					{value ? "Change Image" : label}
+					{isUploading ? "Uploading..." : value ? "Change Image" : label}
 				</Button>
 				{value && (
 					<Button
@@ -82,6 +104,7 @@ export function ImageUploadWithCrop({
 						size="icon"
 						onClick={handleClear}
 						title="Clear image"
+						disabled={isUploading}
 					>
 						<X className="h-4 w-4" />
 					</Button>

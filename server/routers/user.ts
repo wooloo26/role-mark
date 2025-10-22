@@ -32,7 +32,7 @@ const updateSettingsSchema = z.object({
 
 const updateProfileSchema = z.object({
 	name: z.string().min(1).max(255).optional(),
-	image: z.url().optional(),
+	image: z.string().optional(),
 })
 
 export const userRouter = createTRPCRouter({

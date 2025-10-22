@@ -1,17 +1,20 @@
 /**
  * File upload API endpoint
- * Handles file uploads for resources
+ * Handles file uploads for resources using Formidable
  */
 
 import { randomUUID } from "node:crypto"
 import { existsSync } from "node:fs"
-import { mkdir, writeFile } from "node:fs/promises"
+import { mkdir, rename } from "node:fs/promises"
 import path from "node:path"
+import { Readable } from "node:stream"
+import type { File as FormidableFile } from "formidable"
+import formidable from "formidable"
 import type { NextRequest } from "next/server"
 import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
-import { getContentTypeFromMime } from "@/lib/file-utils"
+import { getContentTypeFromMime, UPLOAD_BASE_DIR } from "@/lib/file-utils"
 
 // Configure max file size (50MB)
 export const config = {
@@ -20,21 +23,7 @@ export const config = {
 	},
 }
 
-const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads")
-const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
-
-// Ensure upload directory exists
-async function ensureUploadDir() {
-	if (!existsSync(UPLOAD_DIR)) {
-		await mkdir(UPLOAD_DIR, { recursive: true })
-	}
-}
-
-// Get file extension and validate
-function getFileExtension(filename: string): string {
-	const ext = path.extname(filename).toLowerCase()
-	return ext
-}
+const MAX_FILE_SIZE = 1024 * 1024 * 1024 // 1GB
 
 export async function POST(request: NextRequest) {
 	try {
@@ -44,49 +33,42 @@ export async function POST(request: NextRequest) {
 			return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 		}
 
-		// Get form data
-		const formData = await request.formData()
-		const files = formData.getAll("files") as File[]
+		// Parse form data using formidable
+		const { files } = await parseForm(request)
 
-		if (!files || files.length === 0) {
+		// Extract files array (formidable returns files as an object)
+		const fileList = files.files as
+			| FormidableFile[]
+			| FormidableFile
+			| undefined
+
+		if (!fileList || (Array.isArray(fileList) && fileList.length === 0)) {
 			return NextResponse.json({ error: "No files provided" }, { status: 400 })
 		}
 
-		// Ensure upload directory exists
-		await ensureUploadDir()
+		// Normalize to array
+		const filesArray = Array.isArray(fileList) ? fileList : [fileList]
 
 		// Process each file
 		const uploadedFiles = []
 
-		for (const file of files) {
-			// Validate file size
-			if (file.size > MAX_FILE_SIZE) {
-				return NextResponse.json(
-					{
-						error: `File ${file.name} exceeds maximum size of ${MAX_FILE_SIZE / 1024 / 1024}MB`,
-					},
-					{ status: 400 },
-				)
-			}
+		for (const file of filesArray) {
+			// Get original filename and extension
+			const ext = getFileExtension(file.originalFilename || "")
+			const uniqueFilename = `${path.basename(file.filepath)}${ext}`
+			const newFilepath = path.join(UPLOAD_BASE_DIR, uniqueFilename)
 
-			// Generate unique filename
-			const ext = getFileExtension(file.name)
-			const uniqueFilename = `${randomUUID()}${ext}`
-			const filepath = path.join(UPLOAD_DIR, uniqueFilename)
-
-			// Convert file to buffer and write to disk
-			const bytes = await file.arrayBuffer()
-			const buffer = Buffer.from(bytes)
-			await writeFile(filepath, buffer)
+			// Rename file to include extension
+			await rename(file.filepath, newFilepath)
 
 			// Prepare file info
 			const fileUrl = `/uploads/${uniqueFilename}`
-			const contentType = getContentTypeFromMime(file.type)
+			const contentType = getContentTypeFromMime(file.mimetype || "")
 
 			uploadedFiles.push({
-				fileName: file.name,
+				fileName: file.originalFilename || uniqueFilename,
 				fileUrl: fileUrl,
-				mimeType: file.type,
+				mimeType: file.mimetype || "application/octet-stream",
 				fileSize: file.size,
 				contentType: contentType,
 			})
@@ -103,4 +85,61 @@ export async function POST(request: NextRequest) {
 			{ status: 500 },
 		)
 	}
+}
+
+// Parse form data using Formidable
+async function parseForm(request: NextRequest): Promise<{
+	fields: formidable.Fields
+	files: formidable.Files
+}> {
+	// Ensure upload directory exists
+	await ensureUploadDir()
+
+	// Create formidable instance
+	const form = formidable({
+		uploadDir: UPLOAD_BASE_DIR,
+		keepExtensions: false,
+		maxFileSize: MAX_FILE_SIZE,
+		multiples: true,
+		filename: () => {
+			// Generate unique filename (extension will be added later)
+			return randomUUID()
+		},
+	})
+
+	// Convert NextRequest to Node.js IncomingMessage-like object
+	const arrayBuffer = await request.arrayBuffer()
+	const buffer = Buffer.from(arrayBuffer)
+
+	// Create a readable stream from the buffer
+	const stream = new Readable()
+	stream.push(buffer)
+	stream.push(null)
+
+	// Add required properties for formidable
+	const nodeRequest = Object.assign(stream, {
+		headers: Object.fromEntries(request.headers.entries()),
+		method: request.method,
+	})
+
+	// Parse the form
+	return new Promise((resolve, reject) => {
+		form.parse(nodeRequest as never, (err, fields, files) => {
+			if (err) reject(err)
+			else resolve({ fields, files })
+		})
+	})
+}
+
+// Ensure upload directory exists
+async function ensureUploadDir() {
+	if (!existsSync(UPLOAD_BASE_DIR)) {
+		await mkdir(UPLOAD_BASE_DIR, { recursive: true })
+	}
+}
+
+// Get file extension and validate
+function getFileExtension(filename: string): string {
+	const ext = path.extname(filename).toLowerCase()
+	return ext
 }

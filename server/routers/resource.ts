@@ -9,13 +9,13 @@
 import { ContentType, ResourceType } from "@prisma/client"
 import { TRPCError } from "@trpc/server"
 import { z } from "zod"
-import { deleteFiles } from "@/lib/file-storage"
+import { deleteFiles } from "@/lib/file-utils"
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc"
 
 // File schema for creating resource files
 const resourceFileSchema = z.object({
 	fileName: z.string().min(1),
-	fileUrl: z.url(),
+	fileUrl: z.string(),
 	mimeType: z.string(),
 	fileSize: z.number().int().positive().optional(),
 	order: z.number().int().min(0).default(0),
@@ -28,7 +28,7 @@ const createResourceSchema = z
 		description: z.string().optional(),
 		type: z.enum(ResourceType),
 		contentType: z.enum(ContentType).nullable().optional(),
-		thumbnailUrl: z.url().optional(),
+		thumbnailUrl: z.string().optional(),
 		files: z.array(resourceFileSchema).min(1),
 		tagIds: z.array(z.string()).default([]),
 		characterIds: z.array(z.string()).default([]),
@@ -66,7 +66,7 @@ const updateResourceSchema = z.object({
 	id: z.string(),
 	title: z.string().min(1).max(255).optional(),
 	description: z.string().optional(),
-	thumbnailUrl: z.url().optional(),
+	thumbnailUrl: z.string().optional(),
 	tagIds: z.array(z.string()).optional(),
 	characterIds: z.array(z.string()).optional(),
 	// Note: type, contentType, and files cannot be updated to maintain data integrity

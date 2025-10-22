@@ -8,8 +8,7 @@ import { readFile, stat } from "node:fs/promises"
 import path from "node:path"
 import type { NextRequest } from "next/server"
 import { NextResponse } from "next/server"
-
-const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads")
+import { UPLOAD_BASE_DIR } from "@/lib/file-utils"
 
 // MIME type mapping
 const MIME_TYPES: Record<string, string> = {
@@ -47,7 +46,7 @@ export async function GET(
 			return NextResponse.json({ error: "Invalid file path" }, { status: 400 })
 		}
 
-		const filepath = path.join(UPLOAD_DIR, filename)
+		const filepath = path.join(UPLOAD_BASE_DIR, filename)
 
 		// Check if file exists
 		if (!existsSync(filepath)) {
@@ -95,7 +94,7 @@ export async function HEAD(
 			return new NextResponse(null, { status: 400 })
 		}
 
-		const filepath = path.join(UPLOAD_DIR, filename)
+		const filepath = path.join(UPLOAD_BASE_DIR, filename)
 
 		// Check if file exists
 		if (!existsSync(filepath)) {
