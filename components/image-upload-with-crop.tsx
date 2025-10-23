@@ -6,6 +6,7 @@ import { useRef, useState } from "react"
 import { toast } from "sonner"
 import { ImageCropDialog } from "@/components/image-crop-dialog"
 import { Button } from "@/components/ui/button"
+import { getFileApiUrl } from "@/lib/path"
 
 interface ImageUploadWithCropProps {
 	value?: string
@@ -119,11 +120,13 @@ export function ImageUploadWithCrop({
 						className={`relative overflow-hidden border rounded-lg ${previewClassName}`}
 					>
 						<Image
-							src={value}
+							src={getFileApiUrl(value)}
 							alt="Preview"
 							fill
 							className="object-cover"
 							sizes="128px"
+							quality={75}
+							priority
 						/>
 					</div>
 					<p className="text-sm text-muted-foreground">Current image</p>

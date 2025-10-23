@@ -2,6 +2,7 @@ import { Shield } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
+import { getFileApiUrl } from "@/lib/path"
 
 interface ProfileHeaderProps {
 	name: string
@@ -22,7 +23,7 @@ export function ProfileHeader({
 			<CardContent className="pt-0 -mt-16">
 				<div className="flex flex-col sm:flex-row items-center sm:items-end gap-6 mb-8">
 					<Avatar className="h-32 w-32 border-4 border-background shadow-xl">
-						<AvatarImage src={imageUrl ?? undefined} alt={name} />
+						<AvatarImage src={getFileApiUrl(imageUrl)} alt={name} />
 						<AvatarFallback className="text-4xl font-bold">
 							{name?.[0]?.toUpperCase() ?? "U"}
 						</AvatarFallback>

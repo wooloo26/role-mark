@@ -8,6 +8,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card"
+import { getFileApiUrl } from "@/lib/path"
 
 interface CharacterCardProps {
 	id: string
@@ -48,7 +49,15 @@ export function CharacterCard({
 					{/* Character Image */}
 					<div className="relative w-50 h-50 overflow-hidden rounded-xl mx-auto">
 						{avatarUrl ? (
-							<Image src={avatarUrl} alt={name} fill className="object-cover" />
+							<Image
+								src={getFileApiUrl(avatarUrl)}
+								alt={name}
+								fill
+								className="object-cover"
+								sizes="(max-width: 768px) 200px, 200px"
+								quality={75}
+								priority
+							/>
 						) : (
 							<div className="w-full h-full flex items-center justify-center">
 								<Avatar className="h-50 w-50 rounded-lg">

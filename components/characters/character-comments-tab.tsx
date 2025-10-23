@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent } from "@/components/ui/card"
+import { getFileApiUrl } from "@/lib/path"
 
 interface Comment {
 	id: string
@@ -33,7 +34,7 @@ export function CharacterCommentsTab({ comments }: CharacterCommentsTabProps) {
 					<CardContent className="p-4">
 						<div className="flex items-start gap-3">
 							<Avatar>
-								<AvatarImage src={cc.comment.author.image || undefined} />
+								<AvatarImage src={getFileApiUrl(cc.comment.author.image)} />
 								<AvatarFallback>
 									{cc.comment.author.name?.charAt(0).toUpperCase() || "U"}
 								</AvatarFallback>

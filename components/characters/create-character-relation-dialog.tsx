@@ -47,6 +47,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
+import { getFileApiUrl } from "@/lib/path"
 import { cn } from "@/lib/utils"
 
 const formSchema = z.object({
@@ -172,7 +173,9 @@ export function CreateCharacterRelationDialog({
 														<div className="flex items-center gap-2">
 															<Avatar className="h-6 w-6">
 																<AvatarImage
-																	src={selectedCharacter.avatarUrl || undefined}
+																	src={getFileApiUrl(
+																		selectedCharacter.avatarUrl,
+																	)}
 																/>
 																<AvatarFallback>
 																	{selectedCharacter.name
@@ -211,7 +214,7 @@ export function CreateCharacterRelationDialog({
 																<div className="flex items-center gap-2 flex-1">
 																	<Avatar className="h-8 w-8">
 																		<AvatarImage
-																			src={character.avatarUrl || undefined}
+																			src={getFileApiUrl(character.avatarUrl)}
 																		/>
 																		<AvatarFallback>
 																			{character.name.charAt(0).toUpperCase()}

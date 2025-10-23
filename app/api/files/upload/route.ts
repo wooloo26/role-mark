@@ -14,7 +14,9 @@ import type { NextRequest } from "next/server"
 import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
-import { getContentTypeFromMime, UPLOAD_BASE_DIR } from "@/lib/file-utils"
+
+// Temporary upload directory
+const TEMP_UPLOAD_DIR = path.join("C:/Space/storage.v2", "uploads", "temp")
 
 // Configure max file size (50MB)
 export const config = {
@@ -50,27 +52,27 @@ export async function POST(request: NextRequest) {
 		const filesArray = Array.isArray(fileList) ? fileList : [fileList]
 
 		// Process each file
-		const uploadedFiles = []
+		const uploadedFiles: {
+			fileName: string
+			fileUrl: string
+			mimeType: string
+			fileSize: number
+		}[] = []
 
 		for (const file of filesArray) {
 			// Get original filename and extension
 			const ext = getFileExtension(file.originalFilename || "")
 			const uniqueFilename = `${path.basename(file.filepath)}${ext}`
-			const newFilepath = path.join(UPLOAD_BASE_DIR, uniqueFilename)
+			const newFilepath = path.join(TEMP_UPLOAD_DIR, uniqueFilename)
 
 			// Rename file to include extension
 			await rename(file.filepath, newFilepath)
 
-			// Prepare file info
-			const fileUrl = `/uploads/${uniqueFilename}`
-			const contentType = getContentTypeFromMime(file.mimetype || "")
-
 			uploadedFiles.push({
 				fileName: file.originalFilename || uniqueFilename,
-				fileUrl: fileUrl,
+				fileUrl: `/uploads/temp/${uniqueFilename}`,
 				mimeType: file.mimetype || "application/octet-stream",
 				fileSize: file.size,
-				contentType: contentType,
 			})
 		}
 
@@ -97,7 +99,7 @@ async function parseForm(request: NextRequest): Promise<{
 
 	// Create formidable instance
 	const form = formidable({
-		uploadDir: UPLOAD_BASE_DIR,
+		uploadDir: TEMP_UPLOAD_DIR,
 		keepExtensions: false,
 		maxFileSize: MAX_FILE_SIZE,
 		multiples: true,
@@ -133,8 +135,8 @@ async function parseForm(request: NextRequest): Promise<{
 
 // Ensure upload directory exists
 async function ensureUploadDir() {
-	if (!existsSync(UPLOAD_BASE_DIR)) {
-		await mkdir(UPLOAD_BASE_DIR, { recursive: true })
+	if (!existsSync(TEMP_UPLOAD_DIR)) {
+		await mkdir(TEMP_UPLOAD_DIR, { recursive: true })
 	}
 }
 

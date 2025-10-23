@@ -39,4 +39,3 @@ next-env.d.ts
 
 /app/generated/prisma
 migrations
-public/uploads

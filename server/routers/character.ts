@@ -4,6 +4,7 @@
 
 import { TRPCError } from "@trpc/server"
 import { z } from "zod"
+import { moveFileToAvatarDir, moveFileToPortraitDir } from "@/lib/file-utils"
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc"
 
 // Character input schemas
@@ -307,7 +308,39 @@ export const characterRouter = createTRPCRouter({
 	create: protectedProcedure
 		.input(createCharacterSchema)
 		.mutation(async ({ ctx, input }) => {
-			const { tagIds, staticTags, ...data } = input
+			const { tagIds, staticTags, avatarUrl, portraitUrl, ...data } = input
+
+			// Move temporary files to their final destinations
+			let finalAvatarUrl: string | null = null
+			let finalPortraitUrl: string | null = null
+
+			if (avatarUrl?.startsWith("/uploads/temp/")) {
+				try {
+					finalAvatarUrl = await moveFileToAvatarDir(avatarUrl)
+				} catch (error) {
+					console.error("Failed to move avatar file:", error)
+					throw new TRPCError({
+						code: "INTERNAL_SERVER_ERROR",
+						message: "Failed to process avatar file",
+					})
+				}
+			} else if (avatarUrl) {
+				finalAvatarUrl = avatarUrl
+			}
+
+			if (portraitUrl?.startsWith("/uploads/temp/")) {
+				try {
+					finalPortraitUrl = await moveFileToPortraitDir(portraitUrl)
+				} catch (error) {
+					console.error("Failed to move portrait file:", error)
+					throw new TRPCError({
+						code: "INTERNAL_SERVER_ERROR",
+						message: "Failed to process portrait file",
+					})
+				}
+			} else if (portraitUrl) {
+				finalPortraitUrl = portraitUrl
+			}
 
 			// Prepare static tags for creation
 			const staticTagsData: Array<{
@@ -349,6 +382,8 @@ export const characterRouter = createTRPCRouter({
 			return await ctx.prisma.character.create({
 				data: {
 					...data,
+					avatarUrl: finalAvatarUrl,
+					portraitUrl: finalPortraitUrl,
 					staticTags:
 						staticTagsData.length > 0
 							? {
@@ -384,7 +419,45 @@ export const characterRouter = createTRPCRouter({
 	update: protectedProcedure
 		.input(updateCharacterSchema)
 		.mutation(async ({ ctx, input }) => {
-			const { id, tagIds, staticTags, ...data } = input
+			const { id, tagIds, staticTags, avatarUrl, portraitUrl, ...data } = input
+
+			// Process avatar and portrait URLs
+			let finalAvatarUrl: string | null | undefined
+			let finalPortraitUrl: string | null | undefined
+
+			// Handle avatar URL
+			if (avatarUrl !== undefined) {
+				if (avatarUrl?.startsWith("/uploads/temp/")) {
+					try {
+						finalAvatarUrl = await moveFileToAvatarDir(avatarUrl)
+					} catch (error) {
+						console.error("Failed to move avatar file:", error)
+						throw new TRPCError({
+							code: "INTERNAL_SERVER_ERROR",
+							message: "Failed to process avatar file",
+						})
+					}
+				} else {
+					finalAvatarUrl = avatarUrl || null
+				}
+			}
+
+			// Handle portrait URL
+			if (portraitUrl !== undefined) {
+				if (portraitUrl?.startsWith("/uploads/temp/")) {
+					try {
+						finalPortraitUrl = await moveFileToPortraitDir(portraitUrl)
+					} catch (error) {
+						console.error("Failed to move portrait file:", error)
+						throw new TRPCError({
+							code: "INTERNAL_SERVER_ERROR",
+							message: "Failed to process portrait file",
+						})
+					}
+				} else {
+					finalPortraitUrl = portraitUrl || null
+				}
+			}
 
 			// Prepare static tags for update
 			let staticTagsUpdate:
@@ -445,11 +518,11 @@ export const characterRouter = createTRPCRouter({
 				where: { id },
 				data: {
 					...(data.name && { name: data.name }),
-					...(data.avatarUrl !== undefined && {
-						avatarUrl: data.avatarUrl || null,
+					...(finalAvatarUrl !== undefined && {
+						avatarUrl: finalAvatarUrl,
 					}),
-					...(data.portraitUrl !== undefined && {
-						portraitUrl: data.portraitUrl || null,
+					...(finalPortraitUrl !== undefined && {
+						portraitUrl: finalPortraitUrl,
 					}),
 					...(data.info !== undefined && { info: data.info }),
 					...(staticTagsUpdate && { staticTags: staticTagsUpdate }),

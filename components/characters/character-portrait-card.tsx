@@ -1,5 +1,6 @@
 import Image from "next/image"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { getFileApiUrl } from "@/lib/path"
 
 interface CharacterPortraitCardProps {
 	portraitUrl: string
@@ -18,10 +19,13 @@ export function CharacterPortraitCard({
 			<CardContent className="pt-0">
 				<div className="aspect-[2/3] relative rounded-lg overflow-hidden mx-auto">
 					<Image
-						src={portraitUrl}
+						src={getFileApiUrl(portraitUrl)}
 						alt={`${name} portrait`}
 						fill
 						className="object-cover"
+						sizes="(max-width: 768px) 100vw, 400px"
+						quality={75}
+						priority
 					/>
 				</div>
 			</CardContent>
