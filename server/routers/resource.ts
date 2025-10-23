@@ -9,7 +9,7 @@
 import { ContentType, ResourceType } from "@prisma/client"
 import { TRPCError } from "@trpc/server"
 import { z } from "zod"
-import { deleteFiles } from "@/lib/file-utils"
+import { deleteFiles, generateThumbnail } from "@/lib/file-utils"
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc"
 
 // File schema for creating resource files
@@ -323,9 +323,33 @@ export const resourceRouter = createTRPCRouter({
 		.mutation(async ({ ctx, input }) => {
 			const { characterIds, tagIds, files, ...resourceData } = input
 
+			// Auto-generate thumbnail from first file if not provided and file is image/video
+			let thumbnailUrl = resourceData.thumbnailUrl
+			if (!thumbnailUrl && files.length > 0) {
+				const firstFile = files[0]
+				if (
+					firstFile.mimeType.startsWith("image/") ||
+					firstFile.mimeType.startsWith("video/")
+				) {
+					try {
+						const generatedThumbnail = await generateThumbnail(
+							firstFile.fileUrl,
+							firstFile.mimeType,
+						)
+						if (generatedThumbnail) {
+							thumbnailUrl = generatedThumbnail
+						}
+					} catch (error) {
+						// Log error but don't fail the resource creation
+						console.error("Failed to generate thumbnail", error)
+					}
+				}
+			}
+
 			return await ctx.prisma.resource.create({
 				data: {
 					...resourceData,
+					thumbnailUrl,
 					uploaderId: ctx.session.user.id,
 					files: {
 						create: files.map((file) => ({
